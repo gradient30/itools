@@ -35,6 +35,12 @@ import RegexTesterTool from "./pages/tools/RegexTesterTool";
 import TextStatsTool from "./pages/tools/TextStatsTool";
 import MarkdownTool from "./pages/tools/MarkdownTool";
 
+// Additional Tools
+import JsonDiffTool from "./pages/tools/JsonDiffTool";
+import CssFormatterTool from "./pages/tools/CssFormatterTool";
+import QrCodeTool from "./pages/tools/QrCodeTool";
+import PasswordGeneratorTool from "./pages/tools/PasswordGeneratorTool";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -74,6 +80,12 @@ const App = () => (
           <Route path="/tools/regex-tester" element={<RegexTesterTool />} />
           <Route path="/tools/text-stats" element={<TextStatsTool />} />
           <Route path="/tools/markdown" element={<MarkdownTool />} />
+          
+          {/* Additional Tools */}
+          <Route path="/tools/json-diff" element={<JsonDiffTool />} />
+          <Route path="/tools/css-formatter" element={<CssFormatterTool />} />
+          <Route path="/tools/qrcode" element={<QrCodeTool />} />
+          <Route path="/tools/password-generator" element={<PasswordGeneratorTool />} />
           
           <Route path="*" element={<NotFound />} />
         </Routes>

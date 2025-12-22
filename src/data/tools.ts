@@ -25,6 +25,8 @@ import {
   FileText,
   Timer,
   LucideIcon,
+  Paintbrush,
+  QrCode,
 } from "lucide-react";
 
 export interface Tool {
@@ -73,6 +75,12 @@ export const toolCategories: ToolCategory[] = [
         icon: FileJson2,
         path: "/tools/json-converter",
       },
+      {
+        name: "JSON Diff对比",
+        description: "对比两个JSON对象的差异",
+        icon: GitCompare,
+        path: "/tools/json-diff",
+      },
     ],
   },
   {
@@ -98,6 +106,12 @@ export const toolCategories: ToolCategory[] = [
         description: "HTML代码格式化与美化",
         icon: Code,
         path: "/tools/html-formatter",
+      },
+      {
+        name: "CSS格式化",
+        description: "CSS代码格式化与压缩",
+        icon: Paintbrush,
+        path: "/tools/css-formatter",
       },
     ],
   },
@@ -130,6 +144,18 @@ export const toolCategories: ToolCategory[] = [
         description: "生成和解析Cron定时任务表达式",
         icon: Timer,
         path: "/tools/cron",
+      },
+      {
+        name: "二维码生成",
+        description: "生成自定义二维码",
+        icon: QrCode,
+        path: "/tools/qrcode",
+      },
+      {
+        name: "密码生成器",
+        description: "生成安全的随机密码",
+        icon: KeyRound,
+        path: "/tools/password-generator",
       },
     ],
   },
