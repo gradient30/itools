@@ -15,6 +15,11 @@ import {
   Shuffle,
   KeyRound,
   Hash,
+  Palette,
+  Regex,
+  GitCompare,
+  CaseSensitive,
+  FileJson2,
   LucideIcon,
 } from "lucide-react";
 
@@ -57,6 +62,12 @@ export const toolCategories: ToolCategory[] = [
         description: "URL参数编码与解码",
         icon: Link,
         path: "/tools/url-codec",
+      },
+      {
+        name: "JSON转换",
+        description: "JSON转YAML/XML/CSV/TypeScript",
+        icon: FileJson2,
+        path: "/tools/json-converter",
       },
     ],
   },
@@ -104,6 +115,12 @@ export const toolCategories: ToolCategory[] = [
         icon: Shuffle,
         path: "/tools/random-string",
       },
+      {
+        name: "颜色选择器",
+        description: "颜色格式转换与选择",
+        icon: Palette,
+        path: "/tools/color-picker",
+      },
     ],
   },
   {
@@ -131,7 +148,26 @@ export const toolCategories: ToolCategory[] = [
     name: "文本工具",
     description: "文本处理与分析",
     icon: Type,
-    tools: [],
+    tools: [
+      {
+        name: "大小写转换",
+        description: "文本大小写格式转换",
+        icon: CaseSensitive,
+        path: "/tools/case-converter",
+      },
+      {
+        name: "文本比较",
+        description: "对比两段文本的差异",
+        icon: GitCompare,
+        path: "/tools/text-diff",
+      },
+      {
+        name: "正则表达式测试",
+        description: "在线正则表达式测试与匹配",
+        icon: Regex,
+        path: "/tools/regex-tester",
+      },
+    ],
   },
   {
     id: "documentation",
