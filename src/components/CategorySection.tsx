@@ -14,9 +14,10 @@ interface CategorySectionProps {
   description: string;
   icon: LucideIcon;
   tools: Tool[];
+  searchQuery?: string;
 }
 
-export function CategorySection({ id, name, description, icon: Icon, tools }: CategorySectionProps) {
+export function CategorySection({ id, name, description, icon: Icon, tools, searchQuery = "" }: CategorySectionProps) {
   return (
     <section id={id} className="scroll-mt-20">
       {/* Category Header */}
@@ -39,6 +40,7 @@ export function CategorySection({ id, name, description, icon: Icon, tools }: Ca
             description={tool.description}
             icon={tool.icon}
             path={tool.path}
+            searchQuery={searchQuery}
           />
         ))}
       </div>
