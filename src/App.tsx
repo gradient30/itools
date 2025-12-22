@@ -46,6 +46,12 @@ import ImageCompressTool from "./pages/tools/ImageCompressTool";
 import Base64ImageTool from "./pages/tools/Base64ImageTool";
 import JwtTool from "./pages/tools/JwtTool";
 
+// Documentation Reference
+import GitReference from "./pages/docs/GitReference";
+import HttpStatusReference from "./pages/docs/HttpStatusReference";
+import RegexReference from "./pages/docs/RegexReference";
+import MarkdownReference from "./pages/docs/MarkdownReference";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -96,6 +102,12 @@ const App = () => (
             <Route path="/tools/base64-image" element={<Base64ImageTool />} />
             <Route path="/tools/jwt" element={<JwtTool />} />
             <Route path="/tools/gradient" element={<GradientTool />} />
+            
+            {/* Documentation Reference */}
+            <Route path="/docs/git" element={<GitReference />} />
+            <Route path="/docs/http-status" element={<HttpStatusReference />} />
+            <Route path="/docs/regex" element={<RegexReference />} />
+            <Route path="/docs/markdown" element={<MarkdownReference />} />
             
             <Route path="*" element={<NotFound />} />
           </Routes>
