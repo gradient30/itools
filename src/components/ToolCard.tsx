@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { LucideIcon } from "lucide-react";
+import { LucideIcon, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { HighlightText } from "./HighlightText";
 
@@ -10,9 +10,26 @@ interface ToolCardProps {
   path: string;
   className?: string;
   searchQuery?: string;
+  isFavorite?: boolean;
+  onToggleFavorite?: () => void;
 }
 
-export function ToolCard({ name, description, icon: Icon, path, className, searchQuery = "" }: ToolCardProps) {
+export function ToolCard({ 
+  name, 
+  description, 
+  icon: Icon, 
+  path, 
+  className, 
+  searchQuery = "",
+  isFavorite = false,
+  onToggleFavorite
+}: ToolCardProps) {
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onToggleFavorite?.();
+  };
+
   return (
     <Link
       to={path}
@@ -26,6 +43,25 @@ export function ToolCard({ name, description, icon: Icon, path, className, searc
         className
       )}
     >
+      {/* Favorite Button */}
+      {onToggleFavorite && (
+        <button
+          onClick={handleFavoriteClick}
+          className={cn(
+            "absolute top-3 right-3 p-1.5 rounded-md transition-all duration-200",
+            "hover:bg-muted/50",
+            isFavorite 
+              ? "text-yellow-500" 
+              : "text-muted-foreground/50 hover:text-muted-foreground"
+          )}
+          aria-label={isFavorite ? "取消收藏" : "添加收藏"}
+        >
+          <Star 
+            className={cn("h-4 w-4", isFavorite && "fill-yellow-500")} 
+          />
+        </button>
+      )}
+
       {/* Icon */}
       <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 border border-primary/20 group-hover:bg-primary/20 transition-colors">
         <Icon className="h-6 w-6 text-primary" />

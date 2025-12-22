@@ -15,9 +15,20 @@ interface CategorySectionProps {
   icon: LucideIcon;
   tools: Tool[];
   searchQuery?: string;
+  isFavorite?: (path: string) => boolean;
+  onToggleFavorite?: (path: string) => void;
 }
 
-export function CategorySection({ id, name, description, icon: Icon, tools, searchQuery = "" }: CategorySectionProps) {
+export function CategorySection({ 
+  id, 
+  name, 
+  description, 
+  icon: Icon, 
+  tools, 
+  searchQuery = "",
+  isFavorite,
+  onToggleFavorite
+}: CategorySectionProps) {
   return (
     <section id={id} className="scroll-mt-20">
       {/* Category Header */}
@@ -41,6 +52,8 @@ export function CategorySection({ id, name, description, icon: Icon, tools, sear
             icon={tool.icon}
             path={tool.path}
             searchQuery={searchQuery}
+            isFavorite={isFavorite?.(tool.path)}
+            onToggleFavorite={onToggleFavorite ? () => onToggleFavorite(tool.path) : undefined}
           />
         ))}
       </div>

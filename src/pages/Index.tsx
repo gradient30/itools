@@ -4,10 +4,13 @@ import { Layout } from "@/components/layout/Layout";
 import { CategorySection } from "@/components/CategorySection";
 import { SearchBox } from "@/components/SearchBox";
 import { ToolCard } from "@/components/ToolCard";
+import { FavoritesSection } from "@/components/FavoritesSection";
 import { toolCategories, allTools } from "@/data/tools";
+import { useFavorites } from "@/hooks/use-favorites";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const { favorites, toggleFavorite, isFavorite } = useFavorites();
 
   // Filter categories that have tools
   const categoriesWithTools = toolCategories.filter((cat) => cat.tools.length > 0);
@@ -113,22 +116,36 @@ const Index = () => {
                       icon={tool.icon}
                       path={tool.path}
                       searchQuery={searchQuery}
+                      isFavorite={isFavorite(tool.path)}
+                      onToggleFavorite={() => toggleFavorite(tool.path)}
                     />
                   ))}
                 </div>
               )}
             </div>
           ) : (
-            categoriesWithTools.map((category) => (
-              <CategorySection
-                key={category.id}
-                id={category.id}
-                name={category.name}
-                description={category.description}
-                icon={category.icon}
-                tools={category.tools}
+            <>
+              {/* Favorites Section */}
+              <FavoritesSection 
+                favorites={favorites}
+                onToggleFavorite={toggleFavorite}
+                isFavorite={isFavorite}
               />
-            ))
+              
+              {/* All Categories */}
+              {categoriesWithTools.map((category) => (
+                <CategorySection
+                  key={category.id}
+                  id={category.id}
+                  name={category.name}
+                  description={category.description}
+                  icon={category.icon}
+                  tools={category.tools}
+                  isFavorite={isFavorite}
+                  onToggleFavorite={toggleFavorite}
+                />
+              ))}
+            </>
           )}
         </div>
       </section>
