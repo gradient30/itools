@@ -20,6 +20,10 @@ import {
   GitCompare,
   CaseSensitive,
   FileJson2,
+  ShieldCheck,
+  BarChart3,
+  FileText,
+  Timer,
   LucideIcon,
 } from "lucide-react";
 
@@ -121,6 +125,12 @@ export const toolCategories: ToolCategory[] = [
         icon: Palette,
         path: "/tools/color-picker",
       },
+      {
+        name: "Cron表达式生成",
+        description: "生成和解析Cron定时任务表达式",
+        icon: Timer,
+        path: "/tools/cron",
+      },
     ],
   },
   {
@@ -140,6 +150,12 @@ export const toolCategories: ToolCategory[] = [
         description: "计算文本的MD5哈希值",
         icon: Hash,
         path: "/tools/md5",
+      },
+      {
+        name: "SHA加密",
+        description: "计算文本的SHA哈希值",
+        icon: ShieldCheck,
+        path: "/tools/sha",
       },
     ],
   },
@@ -166,6 +182,18 @@ export const toolCategories: ToolCategory[] = [
         description: "在线正则表达式测试与匹配",
         icon: Regex,
         path: "/tools/regex-tester",
+      },
+      {
+        name: "文本统计",
+        description: "统计文本字符、单词、行数等信息",
+        icon: BarChart3,
+        path: "/tools/text-stats",
+      },
+      {
+        name: "Markdown转HTML",
+        description: "将Markdown文本转换为HTML",
+        icon: FileText,
+        path: "/tools/markdown",
       },
     ],
   },
