@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/navigation-menu";
 import { cn } from "@/lib/utils";
 import { toolCategories } from "@/data/tools";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -73,8 +74,8 @@ export function Header() {
           </NavigationMenu>
         </div>
 
-        {/* Search & Mobile Menu */}
-        <div className="flex items-center gap-3">
+        {/* Search & Theme Toggle & Mobile Menu */}
+        <div className="flex items-center gap-2">
           <div className="hidden sm:flex relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -84,6 +85,8 @@ export function Header() {
               className="w-[200px] pl-9 bg-secondary/50 border-border/50 focus:border-primary"
             />
           </div>
+          
+          <ThemeToggle />
           
           <Button
             variant="ghost"
