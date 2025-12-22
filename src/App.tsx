@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { ThemeProvider } from "next-themes";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
@@ -48,58 +49,60 @@ import JwtTool from "./pages/tools/JwtTool";
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          
-          {/* Conversion Tools */}
-          <Route path="/tools/timestamp" element={<TimestampTool />} />
-          <Route path="/tools/radix" element={<RadixTool />} />
-          <Route path="/tools/url-codec" element={<UrlCodecTool />} />
-          <Route path="/tools/json-converter" element={<JsonConverterTool />} />
-          
-          {/* Formatting Tools */}
-          <Route path="/tools/json-formatter" element={<JsonFormatterTool />} />
-          <Route path="/tools/sql-formatter" element={<SqlFormatterTool />} />
-          <Route path="/tools/html-formatter" element={<HtmlFormatterTool />} />
-          
-          {/* Generation Tools */}
-          <Route path="/tools/uuid" element={<UuidTool />} />
-          <Route path="/tools/random-string" element={<RandomStringTool />} />
-          <Route path="/tools/color-picker" element={<ColorPickerTool />} />
-          <Route path="/tools/cron" element={<CronTool />} />
-          
-          {/* Encryption Tools */}
-          <Route path="/tools/base64" element={<Base64Tool />} />
-          <Route path="/tools/md5" element={<Md5Tool />} />
-          <Route path="/tools/sha" element={<ShaTool />} />
-          
-          {/* Text Tools */}
-          <Route path="/tools/case-converter" element={<CaseConverterTool />} />
-          <Route path="/tools/text-diff" element={<TextDiffTool />} />
-          <Route path="/tools/regex-tester" element={<RegexTesterTool />} />
-          <Route path="/tools/text-stats" element={<TextStatsTool />} />
-          <Route path="/tools/markdown" element={<MarkdownTool />} />
-          
-          {/* Additional Tools */}
-          <Route path="/tools/json-diff" element={<JsonDiffTool />} />
-          <Route path="/tools/css-formatter" element={<CssFormatterTool />} />
-          <Route path="/tools/qrcode" element={<QrCodeTool />} />
-          <Route path="/tools/password-generator" element={<PasswordGeneratorTool />} />
-          <Route path="/tools/image-compress" element={<ImageCompressTool />} />
-          <Route path="/tools/base64-image" element={<Base64ImageTool />} />
-          <Route path="/tools/jwt" element={<JwtTool />} />
-          <Route path="/tools/gradient" element={<GradientTool />} />
-          
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            
+            {/* Conversion Tools */}
+            <Route path="/tools/timestamp" element={<TimestampTool />} />
+            <Route path="/tools/radix" element={<RadixTool />} />
+            <Route path="/tools/url-codec" element={<UrlCodecTool />} />
+            <Route path="/tools/json-converter" element={<JsonConverterTool />} />
+            
+            {/* Formatting Tools */}
+            <Route path="/tools/json-formatter" element={<JsonFormatterTool />} />
+            <Route path="/tools/sql-formatter" element={<SqlFormatterTool />} />
+            <Route path="/tools/html-formatter" element={<HtmlFormatterTool />} />
+            
+            {/* Generation Tools */}
+            <Route path="/tools/uuid" element={<UuidTool />} />
+            <Route path="/tools/random-string" element={<RandomStringTool />} />
+            <Route path="/tools/color-picker" element={<ColorPickerTool />} />
+            <Route path="/tools/cron" element={<CronTool />} />
+            
+            {/* Encryption Tools */}
+            <Route path="/tools/base64" element={<Base64Tool />} />
+            <Route path="/tools/md5" element={<Md5Tool />} />
+            <Route path="/tools/sha" element={<ShaTool />} />
+            
+            {/* Text Tools */}
+            <Route path="/tools/case-converter" element={<CaseConverterTool />} />
+            <Route path="/tools/text-diff" element={<TextDiffTool />} />
+            <Route path="/tools/regex-tester" element={<RegexTesterTool />} />
+            <Route path="/tools/text-stats" element={<TextStatsTool />} />
+            <Route path="/tools/markdown" element={<MarkdownTool />} />
+            
+            {/* Additional Tools */}
+            <Route path="/tools/json-diff" element={<JsonDiffTool />} />
+            <Route path="/tools/css-formatter" element={<CssFormatterTool />} />
+            <Route path="/tools/qrcode" element={<QrCodeTool />} />
+            <Route path="/tools/password-generator" element={<PasswordGeneratorTool />} />
+            <Route path="/tools/image-compress" element={<ImageCompressTool />} />
+            <Route path="/tools/base64-image" element={<Base64ImageTool />} />
+            <Route path="/tools/jwt" element={<JwtTool />} />
+            <Route path="/tools/gradient" element={<GradientTool />} />
+            
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </ThemeProvider>
 );
 
 export default App;
