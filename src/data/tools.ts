@@ -27,6 +27,10 @@ import {
   LucideIcon,
   Paintbrush,
   QrCode,
+  ImageDown,
+  Image,
+  Key,
+  Blend,
 } from "lucide-react";
 
 export interface Tool {
@@ -80,6 +84,24 @@ export const toolCategories: ToolCategory[] = [
         description: "对比两个JSON对象的差异",
         icon: GitCompare,
         path: "/tools/json-diff",
+      },
+      {
+        name: "图片压缩",
+        description: "压缩图片文件大小",
+        icon: ImageDown,
+        path: "/tools/image-compress",
+      },
+      {
+        name: "Base64图片转换",
+        description: "图片与Base64编码互转",
+        icon: Image,
+        path: "/tools/base64-image",
+      },
+      {
+        name: "JWT解析",
+        description: "解析JWT Token查看内容",
+        icon: Key,
+        path: "/tools/jwt",
       },
     ],
   },
@@ -156,6 +178,12 @@ export const toolCategories: ToolCategory[] = [
         description: "生成安全的随机密码",
         icon: KeyRound,
         path: "/tools/password-generator",
+      },
+      {
+        name: "颜色渐变生成器",
+        description: "创建CSS渐变效果",
+        icon: Blend,
+        path: "/tools/gradient",
       },
     ],
   },
