@@ -31,6 +31,8 @@ import {
   Image,
   Key,
   Blend,
+  GitBranch,
+  Globe,
 } from "lucide-react";
 
 export interface Tool {
@@ -256,7 +258,32 @@ export const toolCategories: ToolCategory[] = [
     name: "文档参考",
     description: "常用文档速查",
     icon: BookOpen,
-    tools: [],
+    tools: [
+      {
+        name: "Git命令速查",
+        description: "常用Git命令参考手册",
+        icon: GitBranch,
+        path: "/docs/git",
+      },
+      {
+        name: "HTTP状态码",
+        description: "HTTP响应状态码完整参考",
+        icon: Globe,
+        path: "/docs/http-status",
+      },
+      {
+        name: "正则表达式参考",
+        description: "正则表达式语法速查手册",
+        icon: Regex,
+        path: "/docs/regex",
+      },
+      {
+        name: "Markdown语法",
+        description: "Markdown语法速查手册",
+        icon: FileText,
+        path: "/docs/markdown",
+      },
+    ],
   },
 ];
 
