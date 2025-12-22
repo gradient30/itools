@@ -22,6 +22,7 @@ import UuidTool from "./pages/tools/UuidTool";
 import RandomStringTool from "./pages/tools/RandomStringTool";
 import ColorPickerTool from "./pages/tools/ColorPickerTool";
 import CronTool from "./pages/tools/CronTool";
+import GradientTool from "./pages/tools/GradientTool";
 
 // Tool pages - Encryption
 import Base64Tool from "./pages/tools/Base64Tool";
@@ -40,6 +41,9 @@ import JsonDiffTool from "./pages/tools/JsonDiffTool";
 import CssFormatterTool from "./pages/tools/CssFormatterTool";
 import QrCodeTool from "./pages/tools/QrCodeTool";
 import PasswordGeneratorTool from "./pages/tools/PasswordGeneratorTool";
+import ImageCompressTool from "./pages/tools/ImageCompressTool";
+import Base64ImageTool from "./pages/tools/Base64ImageTool";
+import JwtTool from "./pages/tools/JwtTool";
 
 const queryClient = new QueryClient();
 
@@ -86,6 +90,10 @@ const App = () => (
           <Route path="/tools/css-formatter" element={<CssFormatterTool />} />
           <Route path="/tools/qrcode" element={<QrCodeTool />} />
           <Route path="/tools/password-generator" element={<PasswordGeneratorTool />} />
+          <Route path="/tools/image-compress" element={<ImageCompressTool />} />
+          <Route path="/tools/base64-image" element={<Base64ImageTool />} />
+          <Route path="/tools/jwt" element={<JwtTool />} />
+          <Route path="/tools/gradient" element={<GradientTool />} />
           
           <Route path="*" element={<NotFound />} />
         </Routes>
