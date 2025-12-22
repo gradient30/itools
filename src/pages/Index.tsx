@@ -1,11 +1,31 @@
+import { useState, useMemo } from "react";
 import { Wrench, Zap, Shield, Sparkles } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { CategorySection } from "@/components/CategorySection";
-import { toolCategories } from "@/data/tools";
+import { SearchBox } from "@/components/SearchBox";
+import { ToolCard } from "@/components/ToolCard";
+import { toolCategories, allTools } from "@/data/tools";
 
 const Index = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+
   // Filter categories that have tools
   const categoriesWithTools = toolCategories.filter((cat) => cat.tools.length > 0);
+
+  // Filter tools based on search query
+  const filteredTools = useMemo(() => {
+    if (!searchQuery.trim()) return null;
+    
+    const query = searchQuery.toLowerCase();
+    return allTools.filter(
+      (tool) =>
+        tool.name.toLowerCase().includes(query) ||
+        tool.description.toLowerCase().includes(query)
+    );
+  }, [searchQuery]);
+
+  const hasSearchResults = filteredTools !== null;
+  const noResults = hasSearchResults && filteredTools.length === 0;
 
   return (
     <Layout>
@@ -36,6 +56,15 @@ const Index = () => {
               无需安装，即开即用，助力高效开发
             </p>
 
+            {/* Search Box */}
+            <div className="mb-8">
+              <SearchBox 
+                value={searchQuery} 
+                onChange={setSearchQuery} 
+                placeholder="搜索工具名称或描述..." 
+              />
+            </div>
+
             {/* Feature Pills */}
             <div className="flex flex-wrap justify-center gap-3">
               <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-card/80 border border-border/50 metal-border text-sm">
@@ -55,19 +84,52 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Tools Categories */}
+      {/* Search Results or Tools Categories */}
       <section className="pb-16">
         <div className="container px-4 space-y-12">
-          {categoriesWithTools.map((category) => (
-            <CategorySection
-              key={category.id}
-              id={category.id}
-              name={category.name}
-              description={category.description}
-              icon={category.icon}
-              tools={category.tools}
-            />
-          ))}
+          {hasSearchResults ? (
+            <div>
+              <div className="flex items-center gap-2 mb-6">
+                <h2 className="text-xl font-bold text-foreground">
+                  搜索结果
+                </h2>
+                <span className="text-muted-foreground">
+                  ({filteredTools.length} 个工具)
+                </span>
+              </div>
+              {noResults ? (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground text-lg">
+                    没有找到匹配的工具，请尝试其他关键词
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                  {filteredTools.map((tool) => (
+                    <ToolCard
+                      key={tool.path}
+                      name={tool.name}
+                      description={tool.description}
+                      icon={tool.icon}
+                      path={tool.path}
+                      searchQuery={searchQuery}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            categoriesWithTools.map((category) => (
+              <CategorySection
+                key={category.id}
+                id={category.id}
+                name={category.name}
+                description={category.description}
+                icon={category.icon}
+                tools={category.tools}
+              />
+            ))
+          )}
         </div>
       </section>
     </Layout>

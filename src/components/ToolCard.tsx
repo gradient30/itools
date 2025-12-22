@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { HighlightText } from "./HighlightText";
 
 interface ToolCardProps {
   name: string;
@@ -8,9 +9,10 @@ interface ToolCardProps {
   icon: LucideIcon;
   path: string;
   className?: string;
+  searchQuery?: string;
 }
 
-export function ToolCard({ name, description, icon: Icon, path, className }: ToolCardProps) {
+export function ToolCard({ name, description, icon: Icon, path, className, searchQuery = "" }: ToolCardProps) {
   return (
     <Link
       to={path}
@@ -32,10 +34,10 @@ export function ToolCard({ name, description, icon: Icon, path, className }: Too
       {/* Content */}
       <div className="space-y-1.5">
         <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
-          {name}
+          <HighlightText text={name} highlight={searchQuery} />
         </h3>
         <p className="text-sm text-muted-foreground line-clamp-2">
-          {description}
+          <HighlightText text={description} highlight={searchQuery} />
         </p>
       </div>
 
