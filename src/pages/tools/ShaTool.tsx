@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ShieldCheck, Copy, Hash, Key, RefreshCw } from "lucide-react";
+import { ShieldCheck, Copy, Hash, Key, RefreshCw, Lightbulb } from "lucide-react";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,6 +18,21 @@ import { hmac, pbkdf2, generateSalt } from "@/lib/crypto-utils";
 
 type Mode = "sha" | "hmac" | "pbkdf2";
 type ShaType = "SHA-1" | "SHA-256" | "SHA-384" | "SHA-512";
+
+const EXAMPLES = {
+  sha: {
+    input: "Hello, World!",
+    expected256: "dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f",
+  },
+  hmac: {
+    input: "这是需要签名的消息",
+    key: "my-secret-key",
+  },
+  pbkdf2: {
+    input: "MyPassword123",
+    salt: "random-salt-value",
+  },
+};
 
 async function sha(message: string, algorithm: ShaType): Promise<string> {
   const encoder = new TextEncoder();
@@ -119,6 +134,26 @@ export default function ShaTool() {
     setHmacResult("");
     setSalt("");
     setPbkdf2Result("");
+  };
+
+  const loadExample = () => {
+    switch (mode) {
+      case "sha":
+        setInput(EXAMPLES.sha.input);
+        break;
+      case "hmac":
+        setInput(EXAMPLES.hmac.input);
+        setHmacKey(EXAMPLES.hmac.key);
+        break;
+      case "pbkdf2":
+        setInput(EXAMPLES.pbkdf2.input);
+        setSalt(EXAMPLES.pbkdf2.salt);
+        break;
+    }
+    setResults({ "SHA-1": "", "SHA-256": "", "SHA-384": "", "SHA-512": "" });
+    setHmacResult("");
+    setPbkdf2Result("");
+    toast({ title: "已加载示例" });
   };
 
   return (
@@ -250,9 +285,15 @@ export default function ShaTool() {
 
         {/* Input */}
         <div className="space-y-2">
-          <Label className="text-base font-semibold">
-            {mode === "pbkdf2" ? "密码" : "输入文本"}
-          </Label>
+          <div className="flex items-center justify-between">
+            <Label className="text-base font-semibold">
+              {mode === "pbkdf2" ? "密码" : "输入文本"}
+            </Label>
+            <Button variant="ghost" size="sm" onClick={loadExample}>
+              <Lightbulb className="h-4 w-4 mr-1" />
+              加载示例
+            </Button>
+          </div>
           <Textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}

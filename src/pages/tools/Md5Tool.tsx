@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Hash, Copy, FileText, Key, RefreshCw } from "lucide-react";
+import { Hash, Copy, FileText, Key, RefreshCw, Lightbulb } from "lucide-react";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,6 +17,21 @@ import { useToast } from "@/hooks/use-toast";
 import { hmacMd5, pbkdf2, generateSalt } from "@/lib/crypto-utils";
 
 type Mode = "md5" | "hmac" | "pbkdf2";
+
+const EXAMPLES = {
+  md5: {
+    input: "Hello, World!",
+    expected: "65a8e27d8879283831b664bd8b7f0ad4",
+  },
+  hmac: {
+    input: "这是需要签名的消息",
+    key: "my-secret-key",
+  },
+  pbkdf2: {
+    input: "MyPassword123",
+    salt: "random-salt-value",
+  },
+};
 
 // Simple MD5 implementation
 function md5(input: string): string {
@@ -215,6 +230,24 @@ export default function Md5Tool() {
     setSalt("");
   };
 
+  const loadExample = () => {
+    switch (mode) {
+      case "md5":
+        setInput(EXAMPLES.md5.input);
+        break;
+      case "hmac":
+        setInput(EXAMPLES.hmac.input);
+        setHmacKey(EXAMPLES.hmac.key);
+        break;
+      case "pbkdf2":
+        setInput(EXAMPLES.pbkdf2.input);
+        setSalt(EXAMPLES.pbkdf2.salt);
+        break;
+    }
+    setResult("");
+    toast({ title: "已加载示例" });
+  };
+
   return (
     <ToolLayout
       title="MD5加密"
@@ -314,9 +347,15 @@ export default function Md5Tool() {
 
         {/* Input */}
         <div className="space-y-2">
-          <Label className="text-base font-semibold">
-            {mode === "pbkdf2" ? "密码" : "输入文本"}
-          </Label>
+          <div className="flex items-center justify-between">
+            <Label className="text-base font-semibold">
+              {mode === "pbkdf2" ? "密码" : "输入文本"}
+            </Label>
+            <Button variant="ghost" size="sm" onClick={loadExample}>
+              <Lightbulb className="h-4 w-4 mr-1" />
+              加载示例
+            </Button>
+          </div>
           <Textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
