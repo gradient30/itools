@@ -21,6 +21,7 @@ import {
   hexToBuffer,
   generateRandomBytes,
 } from "@/lib/crypto-utils";
+import { FileEncryptor } from "@/components/FileEncryptor";
 
 type AesMode = "GCM" | "CBC" | "CTR";
 type KeySize = 128 | 192 | 256;
@@ -532,6 +533,9 @@ export default function AesTool() {
             </li>
           </ul>
         </div>
+
+        {/* File Encryption Section */}
+        <FileEncryptor />
       </div>
     </ToolLayout>
   );
