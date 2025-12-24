@@ -58,7 +58,7 @@ const Index = () => {
                 <Wrench className="h-6 w-6 text-primary-foreground" />
               </div>
               <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-                程序员工具箱
+                万能工具箱
               </h1>
             </div>
 
