@@ -61,12 +61,11 @@ export default function SqlFormatterTool() {
   const exampleSQL = "select id, name, email from users where status = 'active' and created_at > '2024-01-01' order by created_at desc limit 10";
 
   return (
-    <Layout>
-      <ToolLayout
-        title="SQL美化"
-        description="SQL语句格式化与美化"
-        icon={Database}
-      >
+    <ToolLayout
+      title="SQL格式化"
+      description="SQL代码格式化与美化"
+      icon={Database}
+    >
         <div className="space-y-6">
           {/* Input */}
           <div className="space-y-2">
