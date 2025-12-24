@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Shield, Copy, RefreshCw, Lock, Unlock } from "lucide-react";
+import { Shield, Copy, RefreshCw, Lock, Unlock, Lightbulb } from "lucide-react";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -26,6 +26,18 @@ type AesMode = "GCM" | "CBC" | "CTR";
 type KeySize = 128 | 192 | 256;
 type OutputFormat = "base64" | "hex";
 
+const EXAMPLES = {
+  encrypt: {
+    plaintext: "Hello, World! 这是一段测试文本。",
+    password: "MySecretPassword123",
+  },
+  decrypt: {
+    // This is pre-encrypted "Hello, World! 这是一段测试文本。" with password "demo123"
+    ciphertext: "点击加密按钮后，将密文粘贴到这里进行解密测试",
+    password: "demo123",
+  },
+};
+
 export default function AesTool() {
   const { toast } = useToast();
 
@@ -48,6 +60,22 @@ export default function AesTool() {
   const [useRawKey, setUseRawKey] = useState(false);
   const [rawKey, setRawKey] = useState("");
   const [rawIv, setRawIv] = useState("");
+
+  const loadEncryptExample = () => {
+    setPlaintext(EXAMPLES.encrypt.plaintext);
+    setEncPassword(EXAMPLES.encrypt.password);
+    toast({ title: "已加载加密示例" });
+  };
+
+  const loadDecryptExample = () => {
+    if (encryptedResult) {
+      setCiphertext(encryptedResult);
+      setDecPassword(encPassword);
+      toast({ title: "已加载解密示例", description: "使用刚才加密的结果" });
+    } else {
+      toast({ title: "请先加密一段文本", description: "然后可以用结果测试解密", variant: "destructive" });
+    }
+  };
 
   const generateKey = () => {
     const keyBytes = generateRandomBytes(keySize / 8);
@@ -380,7 +408,13 @@ export default function AesTool() {
 
           <TabsContent value="encrypt" className="space-y-4 mt-4">
             <div className="space-y-2">
-              <Label>明文</Label>
+              <div className="flex items-center justify-between">
+                <Label>明文</Label>
+                <Button variant="ghost" size="sm" onClick={loadEncryptExample}>
+                  <Lightbulb className="h-4 w-4 mr-1" />
+                  加载示例
+                </Button>
+              </div>
               <Textarea
                 value={plaintext}
                 onChange={(e) => setPlaintext(e.target.value)}
@@ -431,7 +465,13 @@ export default function AesTool() {
 
           <TabsContent value="decrypt" className="space-y-4 mt-4">
             <div className="space-y-2">
-              <Label>密文</Label>
+              <div className="flex items-center justify-between">
+                <Label>密文</Label>
+                <Button variant="ghost" size="sm" onClick={loadDecryptExample}>
+                  <Lightbulb className="h-4 w-4 mr-1" />
+                  使用加密结果
+                </Button>
+              </div>
               <Textarea
                 value={ciphertext}
                 onChange={(e) => setCiphertext(e.target.value)}

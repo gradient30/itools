@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { KeyRound, Copy, ArrowDown, ArrowUp, Lock, Unlock, RefreshCw } from "lucide-react";
+import { KeyRound, Copy, ArrowDown, ArrowUp, Lock, Unlock, RefreshCw, Lightbulb } from "lucide-react";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,6 +11,17 @@ import { useToast } from "@/hooks/use-toast";
 import { aesGcmEncrypt, aesGcmDecrypt } from "@/lib/crypto-utils";
 
 type Mode = "base64" | "aes";
+
+const EXAMPLES = {
+  base64: {
+    decoded: "Hello, World! 这是Base64编码测试。",
+    encoded: "SGVsbG8sIFdvcmxkISDov5nmmK9CYXNlNjTnvJbnoIHmtYvor5XjgII=",
+  },
+  aes: {
+    decoded: "这是一段需要加密的敏感信息",
+    password: "MySecretKey123",
+  },
+};
 
 export default function Base64Tool() {
   const { toast } = useToast();
@@ -88,6 +99,18 @@ export default function Base64Tool() {
     setPassword("");
   };
 
+  const loadExample = () => {
+    if (mode === "base64") {
+      setDecoded(EXAMPLES.base64.decoded);
+      setEncoded(EXAMPLES.base64.encoded);
+    } else {
+      setDecoded(EXAMPLES.aes.decoded);
+      setPassword(EXAMPLES.aes.password);
+      setEncoded("");
+    }
+    toast({ title: "已加载示例" });
+  };
+
   return (
     <ToolLayout
       title="Base64编解码"
@@ -154,11 +177,16 @@ export default function Base64Tool() {
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <Label className="text-base font-semibold">原文</Label>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => copyToClipboard(decoded, "原文")}
-              disabled={!decoded}
+            <div className="flex gap-1">
+              <Button variant="ghost" size="sm" onClick={loadExample}>
+                <Lightbulb className="h-4 w-4 mr-1" />
+                示例
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => copyToClipboard(decoded, "原文")}
+                disabled={!decoded}
             >
               <Copy className="h-4 w-4 mr-1" />
               复制
@@ -200,9 +228,10 @@ export default function Base64Tool() {
               onClick={() => copyToClipboard(encoded, mode === "aes" ? "密文" : "Base64编码")}
               disabled={!encoded}
             >
-              <Copy className="h-4 w-4 mr-1" />
-              复制
-            </Button>
+                <Copy className="h-4 w-4 mr-1" />
+                复制
+              </Button>
+            </div>
           </div>
           <Textarea
             value={encoded}
