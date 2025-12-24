@@ -1,8 +1,16 @@
-import { useEffect } from "react";
-import { ArrowLeft, LucideIcon } from "lucide-react";
+import { useEffect, useMemo } from "react";
+import { Home, LucideIcon } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { useHistory } from "@/hooks/use-history";
+import { toolCategories } from "@/data/tools";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 interface ToolLayoutProps {
   title: string;
@@ -19,15 +27,40 @@ export function ToolLayout({ title, description, icon: Icon, children }: ToolLay
     addToHistory(location.pathname);
   }, [location.pathname, addToHistory]);
 
+  // 根据当前路径找到对应的分类
+  const category = useMemo(() => {
+    return toolCategories.find((cat) =>
+      cat.tools.some((tool) => tool.path === location.pathname)
+    );
+  }, [location.pathname]);
+
   return (
     <div className="container px-4 py-8">
-      {/* Back Button */}
-      <Link to="/">
-        <Button variant="ghost" className="mb-6 gap-2 text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="h-4 w-4" />
-          返回首页
-        </Button>
-      </Link>
+      {/* Breadcrumb Navigation */}
+      <Breadcrumb className="mb-6">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/" className="flex items-center gap-1">
+                <Home className="h-4 w-4" />
+                首页
+              </Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          {category && (
+            <>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <span className="text-muted-foreground">{category.name}</span>
+              </BreadcrumbItem>
+            </>
+          )}
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>{title}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
 
       {/* Tool Header */}
       <div className="flex items-center gap-4 mb-8">
