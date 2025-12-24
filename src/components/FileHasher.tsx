@@ -1,11 +1,10 @@
 import { useState, useRef } from "react";
-import { Upload, File, X, Hash, Loader2 } from "lucide-react";
+import { Hash, Loader2, File as FileIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { bufferToHex } from "@/lib/crypto-utils";
+import { FileDropzone } from "@/components/ui/file-dropzone";
+import { ToolSection } from "@/components/ui/tool-section";
 
 interface FileHasherProps {
   onHashCalculated: (hashes: Record<string, string>, fileName: string, fileSize: number) => void;
@@ -139,21 +138,12 @@ export function FileHasher({ onHashCalculated, algorithms = ["MD5", "SHA-256"] }
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
 
-  const formatFileSize = (bytes: number) => {
-    if (bytes < 1024) return bytes + " B";
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + " KB";
-    return (bytes / (1024 * 1024)).toFixed(2) + " MB";
-  };
-
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 100 * 1024 * 1024) {
-        toast({ title: "文件过大", description: "文件大小不能超过100MB", variant: "destructive" });
-        return;
-      }
-      setSelectedFile(file);
+  const handleFileSelect = (file: File) => {
+    if (file.size > 100 * 1024 * 1024) {
+      toast({ title: "文件过大", description: "文件大小不能超过100MB", variant: "destructive" });
+      return;
     }
+    setSelectedFile(file);
   };
 
   const calculateHashes = async () => {
@@ -199,57 +189,26 @@ export function FileHasher({ onHashCalculated, algorithms = ["MD5", "SHA-256"] }
   };
 
   return (
-    <div className="space-y-4 p-4 border border-border rounded-lg bg-muted/30">
-      <div className="flex items-center gap-2 text-sm font-medium">
-        <File className="h-4 w-4" />
-        文件哈希计算
-      </div>
-
-      <div className="space-y-3">
-        <Input
-          ref={fileInputRef}
-          type="file"
-          onChange={handleFileSelect}
-          className="hidden"
+    <ToolSection
+      title="文件哈希计算"
+      icon={FileIcon}
+      variant="muted"
+    >
+      <div className="space-y-4">
+        <FileDropzone
+          file={selectedFile}
+          onFileSelect={handleFileSelect}
+          onFileClear={clearFile}
+          isProcessing={isProcessing}
+          progress={progress}
+          maxSize={100 * 1024 * 1024}
         />
-
-        {!selectedFile ? (
-          <Button
-            variant="outline"
-            className="w-full h-20 border-dashed"
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <div className="flex flex-col items-center gap-2">
-              <Upload className="h-6 w-6" />
-              <span>点击选择文件 (最大100MB)</span>
-            </div>
-          </Button>
-        ) : (
-          <div className="flex items-center gap-3 p-3 bg-background rounded-lg border">
-            <File className="h-8 w-8 text-muted-foreground shrink-0" />
-            <div className="flex-1 min-w-0">
-              <p className="font-medium truncate">{selectedFile.name}</p>
-              <p className="text-sm text-muted-foreground">{formatFileSize(selectedFile.size)}</p>
-            </div>
-            <Button variant="ghost" size="icon" onClick={clearFile} disabled={isProcessing}>
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-        )}
-
-        {isProcessing && (
-          <div className="space-y-2">
-            <Progress value={progress} className="h-2" />
-            <p className="text-sm text-muted-foreground text-center">
-              正在计算... {Math.round(progress)}%
-            </p>
-          </div>
-        )}
 
         <Button
           onClick={calculateHashes}
           disabled={!selectedFile || isProcessing}
           className="w-full"
+          size="lg"
         >
           {isProcessing ? (
             <>
@@ -264,6 +223,6 @@ export function FileHasher({ onHashCalculated, algorithms = ["MD5", "SHA-256"] }
           )}
         </Button>
       </div>
-    </div>
+    </ToolSection>
   );
 }

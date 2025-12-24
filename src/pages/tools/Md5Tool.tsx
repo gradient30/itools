@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Hash, Copy, FileText, Key, RefreshCw, Lightbulb } from "lucide-react";
+import { Hash, Copy, FileText, Key, RefreshCw, Lightbulb, Info } from "lucide-react";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -16,6 +17,8 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { hmacMd5, pbkdf2, generateSalt } from "@/lib/crypto-utils";
 import { FileHasher } from "@/components/FileHasher";
+import { ToolSection, ActionBar, InfoBox } from "@/components/ui/tool-section";
+import { cn } from "@/lib/utils";
 
 type Mode = "md5" | "hmac" | "pbkdf2";
 
@@ -266,60 +269,67 @@ export default function Md5Tool() {
       description="MD5哈希、HMAC-MD5、PBKDF2密钥派生"
       icon={Hash}
     >
-      <div className="space-y-6">
-        {/* Mode Selector */}
-        <Tabs value={mode} onValueChange={(v) => { setMode(v as Mode); setResult(""); }}>
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="md5">MD5</TabsTrigger>
-            <TabsTrigger value="hmac">HMAC-MD5</TabsTrigger>
-            <TabsTrigger value="pbkdf2">PBKDF2</TabsTrigger>
-          </TabsList>
+      {/* Mode Selector */}
+      <Tabs value={mode} onValueChange={(v) => { setMode(v as Mode); setResult(""); }}>
+        <TabsList className="grid w-full grid-cols-3 h-11">
+          <TabsTrigger value="md5" className="text-sm">MD5</TabsTrigger>
+          <TabsTrigger value="hmac" className="text-sm">HMAC-MD5</TabsTrigger>
+          <TabsTrigger value="pbkdf2" className="text-sm">PBKDF2</TabsTrigger>
+        </TabsList>
 
-          <TabsContent value="hmac" className="mt-4">
-            <div className="p-4 rounded-lg bg-primary/5 border border-primary/20 space-y-3">
-              <div className="flex items-center gap-2 text-sm font-medium text-primary">
-                <Key className="h-4 w-4" />
-                HMAC-MD5 密钥哈希
+        <div className="mt-5">
+          {/* Mode-specific Options */}
+          <TabsContent value="hmac" className="mt-0">
+            <ToolSection variant="accent" className="mb-5">
+              <div className="flex items-center gap-2 mb-3">
+                <Key className="h-4 w-4 text-primary" />
+                <span className="text-sm font-medium">HMAC-MD5 密钥哈希</span>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="hmacKey">密钥 (必填)</Label>
+                <Label htmlFor="hmacKey" className="text-sm">密钥</Label>
                 <Input
                   id="hmacKey"
                   value={hmacKey}
                   onChange={(e) => setHmacKey(e.target.value)}
                   placeholder="输入HMAC密钥..."
-                  className="font-mono"
+                  className="font-mono bg-background/50"
                 />
               </div>
-            </div>
+            </ToolSection>
           </TabsContent>
 
-          <TabsContent value="pbkdf2" className="mt-4">
-            <div className="p-4 rounded-lg bg-primary/5 border border-primary/20 space-y-4">
-              <div className="flex items-center gap-2 text-sm font-medium text-primary">
-                <Key className="h-4 w-4" />
-                PBKDF2 密钥派生
+          <TabsContent value="pbkdf2" className="mt-0">
+            <ToolSection variant="accent" className="mb-5">
+              <div className="flex items-center gap-2 mb-4">
+                <Key className="h-4 w-4 text-primary" />
+                <span className="text-sm font-medium">PBKDF2 密钥派生</span>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="salt">盐值 (Salt)</Label>
+                  <Label htmlFor="salt" className="text-sm">盐值 (Salt)</Label>
                   <div className="flex gap-2">
                     <Input
                       id="salt"
                       value={salt}
                       onChange={(e) => setSalt(e.target.value)}
                       placeholder="输入盐值..."
-                      className="font-mono"
+                      className="font-mono bg-background/50"
                     />
-                    <Button variant="outline" size="icon" onClick={handleGenerateSalt} title="生成随机盐值">
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      onClick={handleGenerateSalt} 
+                      title="生成随机盐值"
+                      className="shrink-0"
+                    >
                       <RefreshCw className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="iterations">迭代次数</Label>
+                  <Label htmlFor="iterations" className="text-sm">迭代次数</Label>
                   <Select value={iterations.toString()} onValueChange={(v) => setIterations(parseInt(v))}>
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-background/50">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -331,160 +341,200 @@ export default function Md5Tool() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="keyLength">密钥长度 (字节)</Label>
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="keyLength" className="text-sm">密钥长度</Label>
                   <Select value={keyLength.toString()} onValueChange={(v) => setKeyLength(parseInt(v))}>
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-background/50">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="16">16 (128位)</SelectItem>
-                      <SelectItem value="32">32 (256位)</SelectItem>
-                      <SelectItem value="64">64 (512位)</SelectItem>
+                      <SelectItem value="16">16 字节 (128位)</SelectItem>
+                      <SelectItem value="32">32 字节 (256位)</SelectItem>
+                      <SelectItem value="64">64 字节 (512位)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
-            </div>
+            </ToolSection>
           </TabsContent>
 
-          <TabsContent value="md5" className="mt-4">
-            <div className="p-4 rounded-lg bg-muted/50 border border-border/50">
-              <p className="text-sm text-muted-foreground">
-                标准 MD5 哈希算法，产生 128 位哈希值。<strong>注意：</strong>MD5 已不推荐用于安全敏感场景。
-              </p>
-            </div>
+          <TabsContent value="md5" className="mt-0">
+            <InfoBox variant="info" className="mb-5">
+              <div className="flex items-start gap-2">
+                <Info className="h-4 w-4 shrink-0 mt-0.5" />
+                <span>标准 MD5 哈希算法，产生 128 位哈希值。<strong>注意：</strong>MD5 已不推荐用于安全敏感场景。</span>
+              </div>
+            </InfoBox>
           </TabsContent>
-        </Tabs>
-
-        {/* Input */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label className="text-base font-semibold">
-              {mode === "pbkdf2" ? "密码" : "输入文本"}
-            </Label>
-            <Button variant="ghost" size="sm" onClick={loadExample}>
-              <Lightbulb className="h-4 w-4 mr-1" />
-              加载示例
-            </Button>
-          </div>
-          <Textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder={mode === "pbkdf2" ? "输入要派生密钥的密码..." : "输入要计算哈希的文本..."}
-            className="min-h-[120px] font-mono"
-          />
         </div>
+      </Tabs>
 
-        {/* Options & Action */}
-        <div className="flex items-center justify-center gap-4 flex-wrap">
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={uppercase}
-              onChange={(e) => setUppercase(e.target.checked)}
-              className="rounded"
-            />
-            大写输出
-          </label>
-          <Button onClick={calculate} className="gap-2">
-            <FileText className="h-4 w-4" />
-            {mode === "pbkdf2" ? "派生密钥" : "计算哈希"}
+      {/* Input Section */}
+      <ToolSection variant="default">
+        <div className="flex items-center justify-between mb-3">
+          <Label className="text-sm font-medium">
+            {mode === "pbkdf2" ? "密码" : "输入文本"}
+          </Label>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={loadExample}
+            className="h-8 text-xs gap-1.5 text-muted-foreground hover:text-foreground"
+          >
+            <Lightbulb className="h-3.5 w-3.5" />
+            加载示例
           </Button>
-          <Button onClick={clearAll} variant="ghost" className="gap-2">
-            <RefreshCw className="h-4 w-4" />
+        </div>
+        <Textarea
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder={mode === "pbkdf2" ? "输入要派生密钥的密码..." : "输入要计算哈希的文本..."}
+          className="min-h-[100px] font-mono text-sm bg-background/50 resize-none"
+        />
+      </ToolSection>
+
+      {/* Action Bar */}
+      <ActionBar align="between">
+        <div className="flex items-center gap-2">
+          <Switch
+            id="uppercase"
+            checked={uppercase}
+            onCheckedChange={setUppercase}
+          />
+          <Label htmlFor="uppercase" className="text-sm cursor-pointer">
+            大写输出
+          </Label>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button onClick={clearAll} variant="outline" size="sm" className="gap-1.5">
+            <RefreshCw className="h-3.5 w-3.5" />
             清空
           </Button>
+          <Button onClick={calculate} size="sm" className="gap-1.5">
+            <FileText className="h-3.5 w-3.5" />
+            {mode === "pbkdf2" ? "派生密钥" : "计算哈希"}
+          </Button>
         </div>
+      </ActionBar>
 
-        {/* Result */}
-        {result && (
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label className="text-base font-semibold">
-                {mode === "md5" && "MD5 (32位)"}
+      {/* Result Section */}
+      {result && (
+        <ToolSection variant="glass">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              <Label className="text-sm font-medium">
+                {mode === "md5" && "MD5 哈希值 (32位)"}
                 {mode === "hmac" && "HMAC-MD5"}
-                {mode === "pbkdf2" && `PBKDF2 派生密钥 (${keyLength * 2}位十六进制)`}
+                {mode === "pbkdf2" && `PBKDF2 派生密钥 (${keyLength * 2}位)`}
               </Label>
-              <Button variant="ghost" size="sm" onClick={copyToClipboard}>
-                <Copy className="h-4 w-4 mr-1" />
-                复制
+            </div>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={copyToClipboard}
+              className="h-8 text-xs gap-1.5"
+            >
+              <Copy className="h-3.5 w-3.5" />
+              复制
+            </Button>
+          </div>
+          
+          <div 
+            className={cn(
+              "rounded-lg border border-border/50 bg-muted/30 p-4",
+              "font-mono text-sm break-all leading-relaxed",
+              "select-all cursor-text"
+            )}
+          >
+            {result}
+          </div>
+
+          {mode === "md5" && (
+            <div className="mt-3 flex items-center justify-center gap-2 text-sm text-muted-foreground">
+              <span className="text-xs px-2 py-0.5 rounded bg-muted">16位</span>
+              <code className="font-mono">{result.slice(8, 24)}</code>
+            </div>
+          )}
+        </ToolSection>
+      )}
+
+      {/* Info Section */}
+      <InfoBox variant="tip">
+        {mode === "md5" && (
+          <p>MD5是一种广泛使用的加密散列函数，产生128位（16字节）的哈希值。常用于文件完整性校验，但已不推荐用于密码存储等安全敏感场景。</p>
+        )}
+        {mode === "hmac" && (
+          <div className="space-y-1">
+            <p><strong>HMAC-MD5</strong> 是带密钥的哈希消息认证码：</p>
+            <ul className="list-disc list-inside ml-1 text-muted-foreground">
+              <li>用于验证消息的完整性和真实性</li>
+              <li>需要发送方和接收方共享相同的密钥</li>
+            </ul>
+          </div>
+        )}
+        {mode === "pbkdf2" && (
+          <div className="space-y-1">
+            <p><strong>PBKDF2</strong> (Password-Based Key Derivation Function 2) 是密码派生函数：</p>
+            <ul className="list-disc list-inside ml-1 text-muted-foreground">
+              <li>将密码转换为固定长度的密钥</li>
+              <li>使用盐值防止彩虹表攻击</li>
+              <li>迭代次数越高越安全，但也更慢</li>
+            </ul>
+          </div>
+        )}
+      </InfoBox>
+
+      {/* Divider */}
+      <div className="relative py-2">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-border/50" />
+        </div>
+        <div className="relative flex justify-center">
+          <span className="bg-card px-3 text-xs text-muted-foreground">文件哈希</span>
+        </div>
+      </div>
+
+      {/* File Hash Section */}
+      <FileHasher 
+        onHashCalculated={handleFileHash}
+        algorithms={["MD5"]}
+      />
+
+      {fileHashResult && (
+        <ToolSection variant="glass">
+          <div className="flex items-center justify-between mb-3">
+            <Label className="text-sm font-medium">文件哈希结果</Label>
+            <span className="text-xs text-muted-foreground truncate max-w-[200px]">
+              {fileHashResult.fileName}
+            </span>
+          </div>
+          {Object.entries(fileHashResult.hashes).map(([algo, hash]) => (
+            <div key={algo} className="flex items-center gap-3">
+              <span className="text-xs font-medium text-muted-foreground w-12 shrink-0">{algo}</span>
+              <div 
+                className={cn(
+                  "flex-1 rounded-lg border border-border/50 bg-muted/20 px-3 py-2",
+                  "font-mono text-xs break-all select-all cursor-text"
+                )}
+              >
+                {uppercase ? hash.toUpperCase() : hash}
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="shrink-0 h-8 w-8"
+                onClick={() => {
+                  navigator.clipboard.writeText(uppercase ? hash.toUpperCase() : hash);
+                  toast({ title: "已复制" });
+                }}
+              >
+                <Copy className="h-3.5 w-3.5" />
               </Button>
             </div>
-            <Textarea
-              value={result}
-              readOnly
-              className="font-mono text-sm bg-muted/30 min-h-[80px]"
-            />
-            {mode === "md5" && (
-              <div className="text-sm text-muted-foreground text-center">
-                16位: {result.slice(8, 24)}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Info */}
-        <div className="p-4 rounded-lg bg-muted/50 border border-border/50 text-sm text-muted-foreground space-y-2">
-          {mode === "md5" && (
-            <p>MD5是一种广泛使用的加密散列函数，产生128位（16字节）的哈希值。注意：MD5已不推荐用于安全敏感场景。</p>
-          )}
-          {mode === "hmac" && (
-            <>
-              <p><strong>HMAC-MD5</strong> 是带密钥的哈希消息认证码。</p>
-              <ul className="list-disc list-inside ml-2">
-                <li>用于验证消息的完整性和真实性</li>
-                <li>需要发送方和接收方共享相同的密钥</li>
-              </ul>
-            </>
-          )}
-          {mode === "pbkdf2" && (
-            <>
-              <p><strong>PBKDF2</strong> (Password-Based Key Derivation Function 2) 是密码派生函数。</p>
-              <ul className="list-disc list-inside ml-2">
-                <li>将密码转换为固定长度的密钥</li>
-                <li>使用盐值防止彩虹表攻击</li>
-                <li>迭代次数越高越安全，但也更慢</li>
-                <li>推荐用于密码存储和密钥生成</li>
-              </ul>
-            </>
-          )}
-        </div>
-
-        {/* File Hash Section */}
-        <FileHasher 
-          onHashCalculated={handleFileHash}
-          algorithms={["MD5"]}
-        />
-
-        {fileHashResult && (
-          <div className="p-4 rounded-lg bg-muted/50 border border-border space-y-3">
-            <div className="flex items-center justify-between">
-              <Label className="text-sm font-semibold">文件哈希结果</Label>
-              <span className="text-xs text-muted-foreground">{fileHashResult.fileName}</span>
-            </div>
-            {Object.entries(fileHashResult.hashes).map(([algo, hash]) => (
-              <div key={algo} className="flex items-center gap-2">
-                <span className="w-16 text-sm text-muted-foreground shrink-0">{algo}:</span>
-                <code className="flex-1 text-xs font-mono break-all bg-background/50 p-2 rounded">
-                  {uppercase ? hash.toUpperCase() : hash}
-                </code>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="shrink-0"
-                  onClick={() => {
-                    navigator.clipboard.writeText(uppercase ? hash.toUpperCase() : hash);
-                    toast({ title: "已复制" });
-                  }}
-                >
-                  <Copy className="h-3 w-3" />
-                </Button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+          ))}
+        </ToolSection>
+      )}
     </ToolLayout>
   );
 }
