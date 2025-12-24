@@ -1,11 +1,22 @@
 import { useState } from "react";
-import { Hash, Copy, FileText } from "lucide-react";
+import { Hash, Copy, FileText, Key, RefreshCw } from "lucide-react";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { hmacMd5, pbkdf2, generateSalt } from "@/lib/crypto-utils";
+
+type Mode = "md5" | "hmac" | "pbkdf2";
 
 // Simple MD5 implementation
 function md5(input: string): string {
@@ -70,7 +81,7 @@ function md5(input: string): string {
   padding.set(bytes);
   padding[bytes.length] = 0x80;
   
-  const view = new DataView(padding.buffer);
+  const view = new DataView(padding.buffer as ArrayBuffer);
   view.setUint32(padding.length - 8, bitLength, true);
 
   // Initialize
@@ -137,81 +148,257 @@ export default function Md5Tool() {
   const [input, setInput] = useState("");
   const [result, setResult] = useState("");
   const [uppercase, setUppercase] = useState(false);
+  const [mode, setMode] = useState<Mode>("md5");
+  
+  // HMAC options
+  const [hmacKey, setHmacKey] = useState("");
+  
+  // PBKDF2 options
+  const [salt, setSalt] = useState("");
+  const [iterations, setIterations] = useState(100000);
+  const [keyLength, setKeyLength] = useState(32);
 
-  const calculate = () => {
+  const calculate = async () => {
     if (!input) {
-      toast({ title: "请输入内容", description: "请先输入要加密的文本", variant: "destructive" });
+      toast({ title: "请输入内容", description: "请先输入要处理的文本", variant: "destructive" });
       return;
     }
-    const hash = md5(input);
-    setResult(uppercase ? hash.toUpperCase() : hash);
+
+    let hash = "";
+    
+    try {
+      switch (mode) {
+        case "md5":
+          hash = md5(input);
+          break;
+        case "hmac":
+          if (!hmacKey) {
+            toast({ title: "请输入密钥", description: "HMAC 需要提供密钥", variant: "destructive" });
+            return;
+          }
+          hash = hmacMd5(input, hmacKey);
+          break;
+        case "pbkdf2":
+          if (!salt) {
+            toast({ title: "请输入盐值", description: "PBKDF2 需要提供盐值", variant: "destructive" });
+            return;
+          }
+          hash = await pbkdf2({
+            password: input,
+            salt,
+            iterations,
+            keyLength,
+            hash: "SHA-256",
+          });
+          break;
+      }
+      
+      setResult(uppercase ? hash.toUpperCase() : hash);
+    } catch (e) {
+      toast({ title: "计算失败", description: "处理时发生错误", variant: "destructive" });
+    }
   };
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(result);
-    toast({ title: "已复制", description: "MD5值已复制到剪贴板" });
+    toast({ title: "已复制", description: "结果已复制到剪贴板" });
+  };
+
+  const handleGenerateSalt = () => {
+    setSalt(generateSalt(16));
+  };
+
+  const clearAll = () => {
+    setInput("");
+    setResult("");
+    setHmacKey("");
+    setSalt("");
   };
 
   return (
     <ToolLayout
       title="MD5加密"
-      description="计算文本的MD5哈希值"
+      description="MD5哈希、HMAC-MD5、PBKDF2密钥派生"
       icon={Hash}
     >
-        <div className="space-y-6">
-          {/* Input */}
-          <div className="space-y-2">
-            <Label className="text-base font-semibold">输入文本</Label>
-            <Textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="输入要计算MD5的文本..."
-              className="min-h-[150px] font-mono"
-            />
-          </div>
+      <div className="space-y-6">
+        {/* Mode Selector */}
+        <Tabs value={mode} onValueChange={(v) => { setMode(v as Mode); setResult(""); }}>
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="md5">MD5</TabsTrigger>
+            <TabsTrigger value="hmac">HMAC-MD5</TabsTrigger>
+            <TabsTrigger value="pbkdf2">PBKDF2</TabsTrigger>
+          </TabsList>
 
-          {/* Options & Action */}
-          <div className="flex items-center justify-center gap-4">
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={uppercase}
-                onChange={(e) => setUppercase(e.target.checked)}
-                className="rounded"
-              />
-              大写输出
-            </label>
-            <Button onClick={calculate} className="gap-2">
-              <FileText className="h-4 w-4" />
-              计算MD5
-            </Button>
-          </div>
-
-          {/* Result */}
-          {result && (
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label className="text-base font-semibold">MD5 (32位)</Label>
-                <Button variant="ghost" size="sm" onClick={copyToClipboard}>
-                  <Copy className="h-4 w-4 mr-1" />
-                  复制
-                </Button>
+          <TabsContent value="hmac" className="mt-4">
+            <div className="p-4 rounded-lg bg-primary/5 border border-primary/20 space-y-3">
+              <div className="flex items-center gap-2 text-sm font-medium text-primary">
+                <Key className="h-4 w-4" />
+                HMAC-MD5 密钥哈希
               </div>
-              <Input
-                value={result}
-                readOnly
-                className="font-mono text-center text-lg bg-muted/30"
-              />
+              <div className="space-y-2">
+                <Label htmlFor="hmacKey">密钥 (必填)</Label>
+                <Input
+                  id="hmacKey"
+                  value={hmacKey}
+                  onChange={(e) => setHmacKey(e.target.value)}
+                  placeholder="输入HMAC密钥..."
+                  className="font-mono"
+                />
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="pbkdf2" className="mt-4">
+            <div className="p-4 rounded-lg bg-primary/5 border border-primary/20 space-y-4">
+              <div className="flex items-center gap-2 text-sm font-medium text-primary">
+                <Key className="h-4 w-4" />
+                PBKDF2 密钥派生
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="salt">盐值 (Salt)</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="salt"
+                      value={salt}
+                      onChange={(e) => setSalt(e.target.value)}
+                      placeholder="输入盐值..."
+                      className="font-mono"
+                    />
+                    <Button variant="outline" size="icon" onClick={handleGenerateSalt} title="生成随机盐值">
+                      <RefreshCw className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="iterations">迭代次数</Label>
+                  <Select value={iterations.toString()} onValueChange={(v) => setIterations(parseInt(v))}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="10000">10,000</SelectItem>
+                      <SelectItem value="50000">50,000</SelectItem>
+                      <SelectItem value="100000">100,000</SelectItem>
+                      <SelectItem value="200000">200,000</SelectItem>
+                      <SelectItem value="500000">500,000</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="keyLength">密钥长度 (字节)</Label>
+                  <Select value={keyLength.toString()} onValueChange={(v) => setKeyLength(parseInt(v))}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="16">16 (128位)</SelectItem>
+                      <SelectItem value="32">32 (256位)</SelectItem>
+                      <SelectItem value="64">64 (512位)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="md5" className="mt-4">
+            <div className="p-4 rounded-lg bg-muted/50 border border-border/50">
+              <p className="text-sm text-muted-foreground">
+                标准 MD5 哈希算法，产生 128 位哈希值。<strong>注意：</strong>MD5 已不推荐用于安全敏感场景。
+              </p>
+            </div>
+          </TabsContent>
+        </Tabs>
+
+        {/* Input */}
+        <div className="space-y-2">
+          <Label className="text-base font-semibold">
+            {mode === "pbkdf2" ? "密码" : "输入文本"}
+          </Label>
+          <Textarea
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder={mode === "pbkdf2" ? "输入要派生密钥的密码..." : "输入要计算哈希的文本..."}
+            className="min-h-[120px] font-mono"
+          />
+        </div>
+
+        {/* Options & Action */}
+        <div className="flex items-center justify-center gap-4 flex-wrap">
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={uppercase}
+              onChange={(e) => setUppercase(e.target.checked)}
+              className="rounded"
+            />
+            大写输出
+          </label>
+          <Button onClick={calculate} className="gap-2">
+            <FileText className="h-4 w-4" />
+            {mode === "pbkdf2" ? "派生密钥" : "计算哈希"}
+          </Button>
+          <Button onClick={clearAll} variant="ghost" className="gap-2">
+            <RefreshCw className="h-4 w-4" />
+            清空
+          </Button>
+        </div>
+
+        {/* Result */}
+        {result && (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label className="text-base font-semibold">
+                {mode === "md5" && "MD5 (32位)"}
+                {mode === "hmac" && "HMAC-MD5"}
+                {mode === "pbkdf2" && `PBKDF2 派生密钥 (${keyLength * 2}位十六进制)`}
+              </Label>
+              <Button variant="ghost" size="sm" onClick={copyToClipboard}>
+                <Copy className="h-4 w-4 mr-1" />
+                复制
+              </Button>
+            </div>
+            <Textarea
+              value={result}
+              readOnly
+              className="font-mono text-sm bg-muted/30 min-h-[80px]"
+            />
+            {mode === "md5" && (
               <div className="text-sm text-muted-foreground text-center">
                 16位: {result.slice(8, 24)}
               </div>
-            </div>
-          )}
-
-          {/* Info */}
-          <div className="p-4 rounded-lg bg-muted/50 border border-border/50 text-sm text-muted-foreground">
-            <p>MD5是一种广泛使用的加密散列函数，产生128位（16字节）的哈希值。注意：MD5已不推荐用于安全敏感场景。</p>
+            )}
           </div>
+        )}
+
+        {/* Info */}
+        <div className="p-4 rounded-lg bg-muted/50 border border-border/50 text-sm text-muted-foreground space-y-2">
+          {mode === "md5" && (
+            <p>MD5是一种广泛使用的加密散列函数，产生128位（16字节）的哈希值。注意：MD5已不推荐用于安全敏感场景。</p>
+          )}
+          {mode === "hmac" && (
+            <>
+              <p><strong>HMAC-MD5</strong> 是带密钥的哈希消息认证码。</p>
+              <ul className="list-disc list-inside ml-2">
+                <li>用于验证消息的完整性和真实性</li>
+                <li>需要发送方和接收方共享相同的密钥</li>
+              </ul>
+            </>
+          )}
+          {mode === "pbkdf2" && (
+            <>
+              <p><strong>PBKDF2</strong> (Password-Based Key Derivation Function 2) 是密码派生函数。</p>
+              <ul className="list-disc list-inside ml-2">
+                <li>将密码转换为固定长度的密钥</li>
+                <li>使用盐值防止彩虹表攻击</li>
+                <li>迭代次数越高越安全，但也更慢</li>
+                <li>推荐用于密码存储和密钥生成</li>
+              </ul>
+            </>
+          )}
+        </div>
       </div>
     </ToolLayout>
   );
