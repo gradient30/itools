@@ -26,6 +26,7 @@ import CronTool from "./pages/tools/CronTool";
 import GradientTool from "./pages/tools/GradientTool";
 
 // Tool pages - Encryption
+import AesTool from "./pages/tools/AesTool";
 import Base64Tool from "./pages/tools/Base64Tool";
 import Md5Tool from "./pages/tools/Md5Tool";
 import ShaTool from "./pages/tools/ShaTool";
@@ -88,6 +89,7 @@ const App = () => (
             <Route path="/tools/cron" element={<CronTool />} />
             
             {/* Encryption Tools */}
+            <Route path="/tools/aes" element={<AesTool />} />
             <Route path="/tools/base64" element={<Base64Tool />} />
             <Route path="/tools/md5" element={<Md5Tool />} />
             <Route path="/tools/sha" element={<ShaTool />} />

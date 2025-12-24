@@ -33,6 +33,7 @@ import {
   Blend,
   GitBranch,
   Globe,
+  Shield,
 } from "lucide-react";
 
 export interface Tool {
@@ -195,6 +196,12 @@ export const toolCategories: ToolCategory[] = [
     description: "编码加密与解密",
     icon: Lock,
     tools: [
+      {
+        name: "AES加密",
+        description: "AES对称加密，支持GCM/CBC/CTR模式",
+        icon: Shield,
+        path: "/tools/aes",
+      },
       {
         name: "Base64编解码",
         description: "Base64编码与解码",
