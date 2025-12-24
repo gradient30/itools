@@ -5,12 +5,15 @@ import { CategorySection } from "@/components/CategorySection";
 import { SearchBox } from "@/components/SearchBox";
 import { ToolCard } from "@/components/ToolCard";
 import { FavoritesSection } from "@/components/FavoritesSection";
+import { HistorySection } from "@/components/HistorySection";
 import { toolCategories, allTools } from "@/data/tools";
 import { useFavorites } from "@/hooks/use-favorites";
+import { useHistory } from "@/hooks/use-history";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { favorites, toggleFavorite, isFavorite } = useFavorites();
+  const { history, clearHistory } = useHistory();
 
   // Filter categories that have tools
   const categoriesWithTools = toolCategories.filter((cat) => cat.tools.length > 0);
@@ -125,6 +128,14 @@ const Index = () => {
             </div>
           ) : (
             <>
+              {/* History Section */}
+              <HistorySection 
+                history={history}
+                onClearHistory={clearHistory}
+                isFavorite={isFavorite}
+                onToggleFavorite={toggleFavorite}
+              />
+
               {/* Favorites Section */}
               <FavoritesSection 
                 favorites={favorites}

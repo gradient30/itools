@@ -1,6 +1,8 @@
+import { useEffect } from "react";
 import { ArrowLeft, LucideIcon } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useHistory } from "@/hooks/use-history";
 
 interface ToolLayoutProps {
   title: string;
@@ -10,6 +12,13 @@ interface ToolLayoutProps {
 }
 
 export function ToolLayout({ title, description, icon: Icon, children }: ToolLayoutProps) {
+  const location = useLocation();
+  const { addToHistory } = useHistory();
+
+  useEffect(() => {
+    addToHistory(location.pathname);
+  }, [location.pathname, addToHistory]);
+
   return (
     <div className="container px-4 py-8">
       {/* Back Button */}
