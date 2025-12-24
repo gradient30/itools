@@ -1,6 +1,5 @@
 import { useState, useMemo } from "react";
 import { Timer, Copy, Check, X } from "lucide-react";
-import { Layout } from "@/components/layout/Layout";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -201,12 +200,11 @@ export default function CronTool() {
   };
 
   return (
-    <Layout>
-      <ToolLayout
-        title="Cron表达式生成"
-        description="生成和解析Cron定时任务表达式"
-        icon={Timer}
-      >
+    <ToolLayout
+      title="Cron表达式生成"
+      description="生成和解析Cron定时任务表达式"
+      icon={Timer}
+    >
         <div className="space-y-6">
           {/* Cron Input */}
           <div className="space-y-2">
@@ -308,8 +306,7 @@ export default function CronTool() {
               ))}
             </div>
           </div>
-        </div>
-      </ToolLayout>
-    </Layout>
+      </div>
+    </ToolLayout>
   );
 }

@@ -1,5 +1,4 @@
 import { useState, useRef } from "react";
-import { Layout } from "@/components/layout/Layout";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -89,12 +88,11 @@ const ImageCompressTool = () => {
     : 0;
 
   return (
-    <Layout>
-      <ToolLayout
-        title="图片压缩"
-        description="压缩图片文件大小，支持调整质量参数"
-        icon={ImageDown}
-      >
+    <ToolLayout
+      title="图片压缩"
+      description="压缩图片文件大小，支持调整质量参数"
+      icon={ImageDown}
+    >
         <div className="space-y-6">
           <input
             type="file"
@@ -199,9 +197,8 @@ const ImageCompressTool = () => {
               </Button>
             </>
           )}
-        </div>
-      </ToolLayout>
-    </Layout>
+      </div>
+    </ToolLayout>
   );
 };
 

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { FileText, Copy, Eye, Code } from "lucide-react";
-import { Layout } from "@/components/layout/Layout";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -126,12 +125,11 @@ export default function MarkdownTool() {
   };
 
   return (
-    <Layout>
-      <ToolLayout
-        title="Markdown转HTML"
-        description="将Markdown文本转换为HTML"
-        icon={FileText}
-      >
+    <ToolLayout
+      title="Markdown转HTML"
+      description="将Markdown文本转换为HTML"
+      icon={FileText}
+    >
         <div className="space-y-6">
           {/* Input */}
           <div className="space-y-2">
@@ -224,8 +222,7 @@ export default function MarkdownTool() {
               <div><code>---</code> → 分割线</div>
             </div>
           </div>
-        </div>
-      </ToolLayout>
-    </Layout>
+      </div>
+    </ToolLayout>
   );
 }

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Hash, Copy, FileText } from "lucide-react";
-import { Layout } from "@/components/layout/Layout";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -154,12 +153,11 @@ export default function Md5Tool() {
   };
 
   return (
-    <Layout>
-      <ToolLayout
-        title="MD5加密"
-        description="计算文本的MD5哈希值"
-        icon={Hash}
-      >
+    <ToolLayout
+      title="MD5加密"
+      description="计算文本的MD5哈希值"
+      icon={Hash}
+    >
         <div className="space-y-6">
           {/* Input */}
           <div className="space-y-2">
@@ -214,8 +212,7 @@ export default function Md5Tool() {
           <div className="p-4 rounded-lg bg-muted/50 border border-border/50 text-sm text-muted-foreground">
             <p>MD5是一种广泛使用的加密散列函数，产生128位（16字节）的哈希值。注意：MD5已不推荐用于安全敏感场景。</p>
           </div>
-        </div>
-      </ToolLayout>
-    </Layout>
+      </div>
+    </ToolLayout>
   );
 }

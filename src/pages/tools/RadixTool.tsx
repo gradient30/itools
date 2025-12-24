@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Binary, Copy, ArrowRightLeft } from "lucide-react";
-import { Layout } from "@/components/layout/Layout";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -52,12 +51,11 @@ export default function RadixTool() {
   ];
 
   return (
-    <Layout>
-      <ToolLayout
-        title="进制转换"
-        description="二进制、八进制、十进制、十六进制互转"
-        icon={Binary}
-      >
+    <ToolLayout
+      title="进制转换"
+      description="二进制、八进制、十进制、十六进制互转"
+      icon={Binary}
+    >
         <div className="space-y-6">
           <div className="flex items-center justify-center gap-2 text-muted-foreground">
             <ArrowRightLeft className="h-5 w-5" />
@@ -110,8 +108,7 @@ export default function RadixTool() {
               ))}
             </div>
           </div>
-        </div>
-      </ToolLayout>
-    </Layout>
+      </div>
+    </ToolLayout>
   );
 }

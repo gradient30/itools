@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { FileJson2, Copy, ArrowRightLeft } from "lucide-react";
-import { Layout } from "@/components/layout/Layout";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -181,12 +180,11 @@ export default function JsonConverterTool() {
 ]`;
 
   return (
-    <Layout>
-      <ToolLayout
-        title="JSON转换"
-        description="JSON转YAML/XML/CSV/TypeScript"
-        icon={FileJson2}
-      >
+    <ToolLayout
+      title="JSON转换"
+      description="JSON转YAML/XML/CSV/TypeScript"
+      icon={FileJson2}
+    >
         <div className="space-y-6">
           {/* Input */}
           <div className="space-y-2">
@@ -279,8 +277,7 @@ export default function JsonConverterTool() {
               <strong>提示：</strong> CSV转换需要输入JSON数组格式。其他格式支持对象和数组。
             </p>
           </div>
-        </div>
-      </ToolLayout>
-    </Layout>
+      </div>
+    </ToolLayout>
   );
 }

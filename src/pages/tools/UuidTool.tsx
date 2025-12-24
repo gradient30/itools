@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Fingerprint, Copy, RefreshCw } from "lucide-react";
-import { Layout } from "@/components/layout/Layout";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -49,12 +48,11 @@ export default function UuidTool() {
   };
 
   return (
-    <Layout>
-      <ToolLayout
-        title="UUID生成"
-        description="生成UUID v4通用唯一识别码"
-        icon={Fingerprint}
-      >
+    <ToolLayout
+      title="UUID生成"
+      description="生成UUID v4通用唯一识别码"
+      icon={Fingerprint}
+    >
         <div className="space-y-6">
           {/* Options */}
           <div className="flex flex-wrap items-center justify-center gap-4">
@@ -122,8 +120,7 @@ export default function UuidTool() {
           <div className="p-4 rounded-lg bg-muted/50 border border-border/50 text-sm text-muted-foreground">
             <p>UUID v4 是基于随机数生成的通用唯一识别码，具有极低的碰撞概率，广泛用于数据库主键、会话ID等场景。</p>
           </div>
-        </div>
-      </ToolLayout>
-    </Layout>
+      </div>
+    </ToolLayout>
   );
 }

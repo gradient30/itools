@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Layout } from "@/components/layout/Layout";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -104,12 +103,11 @@ const JwtTool = () => {
   };
 
   return (
-    <Layout>
-      <ToolLayout
-        title="JWT解析"
-        description="解析和验证JWT令牌，查看Header、Payload和签名"
-        icon={Key}
-      >
+    <ToolLayout
+      title="JWT解析"
+      description="解析和验证JWT令牌，查看Header、Payload和签名"
+      icon={Key}
+    >
         <div className="space-y-6">
           <Card>
             <CardHeader>
@@ -234,9 +232,8 @@ const JwtTool = () => {
               </Card>
             </>
           )}
-        </div>
-      </ToolLayout>
-    </Layout>
+      </div>
+    </ToolLayout>
   );
 };
 

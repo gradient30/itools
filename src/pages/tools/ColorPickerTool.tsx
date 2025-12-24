@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Palette, Copy } from "lucide-react";
-import { Layout } from "@/components/layout/Layout";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -85,12 +84,11 @@ export default function ColorPickerTool() {
   const hslValue = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
 
   return (
-    <Layout>
-      <ToolLayout
-        title="颜色选择器"
-        description="颜色格式转换与选择"
-        icon={Palette}
-      >
+    <ToolLayout
+      title="颜色选择器"
+      description="颜色格式转换与选择"
+      icon={Palette}
+    >
         <div className="space-y-6">
           {/* Color Preview */}
           <div className="flex flex-col items-center gap-4">
@@ -225,8 +223,7 @@ export default function ColorPickerTool() {
               ))}
             </div>
           </div>
-        </div>
-      </ToolLayout>
-    </Layout>
+      </div>
+    </ToolLayout>
   );
 }

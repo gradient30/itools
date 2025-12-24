@@ -1,6 +1,5 @@
 import { useState, useMemo } from "react";
 import { BarChart3, Copy } from "lucide-react";
-import { Layout } from "@/components/layout/Layout";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -125,12 +124,11 @@ export default function TextStatsTool() {
   const readingTimeMinutes = Math.ceil((stats.chineseChars / 200) + (stats.englishWords / 250));
 
   return (
-    <Layout>
-      <ToolLayout
-        title="文本统计"
-        description="统计文本字符、单词、行数等信息"
-        icon={BarChart3}
-      >
+    <ToolLayout
+      title="文本统计"
+      description="统计文本字符、单词、行数等信息"
+      icon={BarChart3}
+    >
         <div className="space-y-6">
           {/* Input */}
           <div className="space-y-2">
@@ -213,8 +211,7 @@ export default function TextStatsTool() {
               </div>
             </div>
           )}
-        </div>
-      </ToolLayout>
-    </Layout>
+      </div>
+    </ToolLayout>
   );
 }

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Clock, Copy, RefreshCw } from "lucide-react";
-import { Layout } from "@/components/layout/Layout";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -48,12 +47,11 @@ export default function TimestampTool() {
   };
 
   return (
-    <Layout>
-      <ToolLayout
-        title="时间戳转换"
-        description="Unix时间戳与日期时间互相转换"
-        icon={Clock}
-      >
+    <ToolLayout
+      title="时间戳转换"
+      description="Unix时间戳与日期时间互相转换"
+      icon={Clock}
+    >
         <div className="space-y-6">
           {/* Current Time Button */}
           <div className="flex justify-center">
@@ -123,8 +121,7 @@ export default function TimestampTool() {
               </div>
             </div>
           </div>
-        </div>
-      </ToolLayout>
-    </Layout>
+      </div>
+    </ToolLayout>
   );
 }

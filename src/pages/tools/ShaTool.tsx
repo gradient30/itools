@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { ShieldCheck, Copy, Hash } from "lucide-react";
-import { Layout } from "@/components/layout/Layout";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -56,12 +55,11 @@ export default function ShaTool() {
   const formatResult = (hash: string) => (uppercase ? hash.toUpperCase() : hash);
 
   return (
-    <Layout>
-      <ToolLayout
-        title="SHA加密"
-        description="计算文本的SHA哈希值"
-        icon={ShieldCheck}
-      >
+    <ToolLayout
+      title="SHA加密"
+      description="计算文本的SHA哈希值"
+      icon={ShieldCheck}
+    >
         <div className="space-y-6">
           {/* Input */}
           <div className="space-y-2">
@@ -151,8 +149,7 @@ export default function ShaTool() {
           <div className="p-4 rounded-lg bg-muted/50 border border-border/50 text-sm text-muted-foreground">
             <p>SHA(Secure Hash Algorithm)是一系列密码散列函数。SHA-256及以上版本被认为是安全的，SHA-1已不推荐用于安全敏感场景。</p>
           </div>
-        </div>
-      </ToolLayout>
-    </Layout>
+      </div>
+    </ToolLayout>
   );
 }

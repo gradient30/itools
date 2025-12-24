@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Shuffle, Copy, RefreshCw } from "lucide-react";
-import { Layout } from "@/components/layout/Layout";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -62,12 +61,11 @@ export default function RandomStringTool() {
   };
 
   return (
-    <Layout>
-      <ToolLayout
-        title="随机字符串"
-        description="自定义长度和字符集的随机字符串生成器"
-        icon={Shuffle}
-      >
+    <ToolLayout
+      title="随机字符串"
+      description="自定义长度和字符集的随机字符串生成器"
+      icon={Shuffle}
+    >
         <div className="space-y-6">
           {/* Options */}
           <div className="grid md:grid-cols-2 gap-6">
@@ -163,8 +161,7 @@ export default function RandomStringTool() {
               </div>
             </div>
           )}
-        </div>
-      </ToolLayout>
-    </Layout>
+      </div>
+    </ToolLayout>
   );
 }

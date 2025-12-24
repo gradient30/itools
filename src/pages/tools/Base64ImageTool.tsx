@@ -1,5 +1,4 @@
 import { useState, useRef } from "react";
-import { Layout } from "@/components/layout/Layout";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -96,12 +95,11 @@ const Base64ImageTool = () => {
   };
 
   return (
-    <Layout>
-      <ToolLayout
-        title="Base64图片转换"
-        description="图片与Base64编码互相转换"
-        icon={ImageLucide}
-      >
+    <ToolLayout
+      title="Base64图片转换"
+      description="图片与Base64编码互相转换"
+      icon={ImageLucide}
+    >
         <Tabs defaultValue="imageToBase64" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="imageToBase64">图片转Base64</TabsTrigger>
@@ -222,9 +220,8 @@ const Base64ImageTool = () => {
               </Card>
             )}
           </TabsContent>
-        </Tabs>
-      </ToolLayout>
-    </Layout>
+      </Tabs>
+    </ToolLayout>
   );
 };
 

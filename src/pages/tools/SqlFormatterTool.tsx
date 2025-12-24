@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Database, Copy, Sparkles } from "lucide-react";
-import { Layout } from "@/components/layout/Layout";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -113,8 +112,7 @@ export default function SqlFormatterTool() {
               className="min-h-[200px] font-mono text-sm bg-muted/30"
             />
           </div>
-        </div>
-      </ToolLayout>
-    </Layout>
+      </div>
+    </ToolLayout>
   );
 }
