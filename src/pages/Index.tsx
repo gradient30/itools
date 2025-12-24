@@ -45,35 +45,30 @@ const Index = () => {
 
   return (
     <Layout>
-      {/* Hero Section */}
-      <section className="relative py-16 md:py-24 overflow-hidden">
+      {/* Hero Section - Compact */}
+      <section className="relative py-8 md:py-12 overflow-hidden">
         {/* Background Effects */}
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent pointer-events-none" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="container px-4 relative">
           <div className="max-w-3xl mx-auto text-center">
-            {/* Logo Icon */}
-            <div className="flex justify-center mb-6">
-              <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-primary tech-glow animate-pulse-glow">
-                <Wrench className="h-10 w-10 text-primary-foreground" />
+            {/* Compact Header with Icon */}
+            <div className="flex items-center justify-center gap-4 mb-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary shadow-lg shadow-primary/20">
+                <Wrench className="h-6 w-6 text-primary-foreground" />
               </div>
+              <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+                程序员工具箱
+              </h1>
             </div>
 
-            {/* Title */}
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 bg-gradient-to-r from-foreground via-foreground to-muted-foreground bg-clip-text text-transparent">
-              程序员工具箱
-            </h1>
-
             {/* Subtitle */}
-            <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+            <p className="text-sm md:text-base text-muted-foreground mb-5 max-w-xl mx-auto">
               在线开发者工具集合，包含转换、格式化、生成、加密等实用工具
-              <br />
-              无需安装，即开即用，助力高效开发
             </p>
 
             {/* Search Box */}
-            <div className="mb-8">
+            <div className="mb-4 max-w-lg mx-auto">
               <SearchBox 
                 value={searchQuery} 
                 onChange={setSearchQuery} 
@@ -81,18 +76,18 @@ const Index = () => {
               />
             </div>
 
-            {/* Feature Pills */}
-            <div className="flex flex-wrap justify-center gap-3">
-              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-card/80 border border-border/50 metal-border text-sm">
-                <Zap className="h-4 w-4 text-primary" />
+            {/* Feature Pills - Inline */}
+            <div className="flex flex-wrap justify-center gap-2">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card/80 border border-border/50 text-xs">
+                <Zap className="h-3 w-3 text-primary" />
                 <span>在线运行</span>
               </div>
-              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-card/80 border border-border/50 metal-border text-sm">
-                <Shield className="h-4 w-4 text-primary" />
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card/80 border border-border/50 text-xs">
+                <Shield className="h-3 w-3 text-primary" />
                 <span>数据安全</span>
               </div>
-              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-card/80 border border-border/50 metal-border text-sm">
-                <Sparkles className="h-4 w-4 text-primary" />
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card/80 border border-border/50 text-xs">
+                <Sparkles className="h-3 w-3 text-primary" />
                 <span>完全免费</span>
               </div>
             </div>
