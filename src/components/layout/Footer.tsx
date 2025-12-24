@@ -12,7 +12,7 @@ export function Footer() {
               <Wrench className="h-4 w-4 text-primary" />
             </div>
             <div>
-              <span className="font-semibold text-foreground">程序员工具箱</span>
+              <span className="font-semibold text-foreground">万能工具箱</span>
               <p className="text-xs text-muted-foreground">在线开发者工具集合</p>
             </div>
           </div>
@@ -31,7 +31,7 @@ export function Footer() {
           <div className="flex items-center gap-1 text-xs text-muted-foreground">
             <span>Made with</span>
             <Heart className="h-3 w-3 text-destructive fill-destructive" />
-            <span>© {new Date().getFullYear()} 程序员工具箱</span>
+            <span>© {new Date().getFullYear()} 万能工具箱</span>
           </div>
         </div>
       </div>
