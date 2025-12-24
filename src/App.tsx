@@ -51,6 +51,12 @@ import GitReference from "./pages/docs/GitReference";
 import HttpStatusReference from "./pages/docs/HttpStatusReference";
 import RegexReference from "./pages/docs/RegexReference";
 import MarkdownReference from "./pages/docs/MarkdownReference";
+import SqlReference from "./pages/docs/SqlReference";
+import LinuxReference from "./pages/docs/LinuxReference";
+import CurlReference from "./pages/docs/CurlReference";
+import AsciiReference from "./pages/docs/AsciiReference";
+import ColorsReference from "./pages/docs/ColorsReference";
+import PortsReference from "./pages/docs/PortsReference";
 
 const queryClient = new QueryClient();
 
@@ -108,6 +114,12 @@ const App = () => (
             <Route path="/docs/http-status" element={<HttpStatusReference />} />
             <Route path="/docs/regex" element={<RegexReference />} />
             <Route path="/docs/markdown" element={<MarkdownReference />} />
+            <Route path="/docs/sql" element={<SqlReference />} />
+            <Route path="/docs/linux" element={<LinuxReference />} />
+            <Route path="/docs/curl" element={<CurlReference />} />
+            <Route path="/docs/ascii" element={<AsciiReference />} />
+            <Route path="/docs/colors" element={<ColorsReference />} />
+            <Route path="/docs/ports" element={<PortsReference />} />
             
             <Route path="*" element={<NotFound />} />
           </Routes>

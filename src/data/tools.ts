@@ -283,6 +283,42 @@ export const toolCategories: ToolCategory[] = [
         icon: FileText,
         path: "/docs/markdown",
       },
+      {
+        name: "SQL常用命令",
+        description: "SQL数据库操作命令速查表",
+        icon: Database,
+        path: "/docs/sql",
+      },
+      {
+        name: "Linux常用命令",
+        description: "Linux系统操作命令速查表",
+        icon: Code,
+        path: "/docs/linux",
+      },
+      {
+        name: "CURL命令指南",
+        description: "CURL HTTP请求命令速查表",
+        icon: Globe,
+        path: "/docs/curl",
+      },
+      {
+        name: "ASCII码表",
+        description: "ASCII字符编码速查表",
+        icon: Binary,
+        path: "/docs/ascii",
+      },
+      {
+        name: "颜色名称参考",
+        description: "CSS/HTML标准颜色名称速查表",
+        icon: Palette,
+        path: "/docs/colors",
+      },
+      {
+        name: "常用端口号",
+        description: "网络服务常用端口速查表",
+        icon: Globe,
+        path: "/docs/ports",
+      },
     ],
   },
 ];
