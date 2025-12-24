@@ -1,4 +1,4 @@
-import { Wrench, Github, Heart } from "lucide-react";
+import { Wrench, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export function Footer() {
@@ -25,14 +25,6 @@ export function Footer() {
             <Link to="/about" className="hover:text-primary transition-colors">
               关于
             </Link>
-            <a
-              href="https://github.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-primary transition-colors"
-            >
-              <Github className="h-4 w-4" />
-            </a>
           </div>
 
           {/* Copyright */}
