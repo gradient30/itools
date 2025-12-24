@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { hmac, pbkdf2, generateSalt } from "@/lib/crypto-utils";
+import { FileHasher } from "@/components/FileHasher";
 
 type Mode = "sha" | "hmac" | "pbkdf2";
 type ShaType = "SHA-1" | "SHA-256" | "SHA-384" | "SHA-512";
@@ -66,6 +67,17 @@ export default function ShaTool() {
   const [keyLength, setKeyLength] = useState(32);
   const [pbkdf2Algo, setPbkdf2Algo] = useState<ShaType>("SHA-256");
   const [pbkdf2Result, setPbkdf2Result] = useState("");
+
+  // File hash results
+  const [fileHashResult, setFileHashResult] = useState<{
+    hashes: Record<string, string>;
+    fileName: string;
+    fileSize: number;
+  } | null>(null);
+
+  const handleFileHash = (hashes: Record<string, string>, fileName: string, fileSize: number) => {
+    setFileHashResult({ hashes, fileName, fileSize });
+  };
 
   const calculate = async () => {
     if (!input) {
@@ -446,6 +458,40 @@ export default function ShaTool() {
             </>
           )}
         </div>
+
+        {/* File Hash Section */}
+        <FileHasher 
+          onHashCalculated={handleFileHash}
+          algorithms={["SHA-1", "SHA-256", "SHA-384", "SHA-512"]}
+        />
+
+        {fileHashResult && (
+          <div className="p-4 rounded-lg bg-muted/50 border border-border space-y-3">
+            <div className="flex items-center justify-between">
+              <Label className="text-sm font-semibold">文件哈希结果</Label>
+              <span className="text-xs text-muted-foreground">{fileHashResult.fileName}</span>
+            </div>
+            {Object.entries(fileHashResult.hashes).map(([algo, hash]) => (
+              <div key={algo} className="flex items-center gap-2">
+                <span className="w-20 text-sm text-muted-foreground shrink-0">{algo}:</span>
+                <code className="flex-1 text-xs font-mono break-all bg-background/50 p-2 rounded">
+                  {uppercase ? hash.toUpperCase() : hash}
+                </code>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="shrink-0"
+                  onClick={() => {
+                    navigator.clipboard.writeText(uppercase ? hash.toUpperCase() : hash);
+                    toast({ title: "已复制" });
+                  }}
+                >
+                  <Copy className="h-3 w-3" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </ToolLayout>
   );
