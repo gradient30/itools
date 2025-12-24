@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Wrench, Zap, Shield, Sparkles } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { CategorySection } from "@/components/CategorySection";
@@ -11,9 +12,18 @@ import { useFavorites } from "@/hooks/use-favorites";
 import { useHistory } from "@/hooks/use-history";
 
 const Index = () => {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchParams] = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState(() => searchParams.get("q") || "");
   const { favorites, toggleFavorite, isFavorite } = useFavorites();
   const { history, clearHistory } = useHistory();
+
+  // Sync search query from URL params
+  useEffect(() => {
+    const urlQuery = searchParams.get("q");
+    if (urlQuery) {
+      setSearchQuery(urlQuery);
+    }
+  }, [searchParams]);
 
   // Filter categories that have tools
   const categoriesWithTools = toolCategories.filter((cat) => cat.tools.length > 0);

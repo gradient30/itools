@@ -1,6 +1,6 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Search, Menu, X, Wrench } from "lucide-react";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -18,6 +18,14 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
+
+  const handleSearch = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  }, [searchQuery, navigate]);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-xl">
@@ -76,7 +84,7 @@ export function Header() {
 
         {/* Search & Theme Toggle & Mobile Menu */}
         <div className="flex items-center gap-2">
-          <div className="hidden sm:flex relative">
+          <form onSubmit={handleSearch} className="hidden sm:flex relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="搜索工具..."
@@ -84,7 +92,7 @@ export function Header() {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-[200px] pl-9 bg-secondary/50 border-border/50 focus:border-primary"
             />
-          </div>
+          </form>
           
           <ThemeToggle />
           
@@ -103,7 +111,7 @@ export function Header() {
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-border/50 bg-background/95 backdrop-blur-xl">
           <div className="container px-4 py-4">
-            <div className="relative mb-4">
+            <form onSubmit={handleSearch} className="relative mb-4">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="搜索工具..."
@@ -111,7 +119,7 @@ export function Header() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-9 bg-secondary/50"
               />
-            </div>
+            </form>
             <div className="space-y-4">
               {toolCategories.map((category) => (
                 <div key={category.id}>
