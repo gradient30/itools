@@ -1,6 +1,5 @@
 import { useState, useMemo } from "react";
 import { Regex, Copy, Check, X } from "lucide-react";
-import { Layout } from "@/components/layout/Layout";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -89,12 +88,11 @@ export default function RegexTesterTool() {
   ];
 
   return (
-    <Layout>
-      <ToolLayout
-        title="正则表达式测试"
-        description="在线正则表达式测试与匹配"
-        icon={Regex}
-      >
+    <ToolLayout
+      title="正则表达式测试"
+      description="在线正则表达式测试与匹配"
+      icon={Regex}
+    >
         <div className="space-y-6">
           {/* Pattern Input */}
           <div className="space-y-2">
@@ -229,8 +227,7 @@ export default function RegexTesterTool() {
               ))}
             </div>
           </div>
-        </div>
-      </ToolLayout>
-    </Layout>
+      </div>
+    </ToolLayout>
   );
 }

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Code, Copy, Sparkles } from "lucide-react";
-import { Layout } from "@/components/layout/Layout";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -85,12 +84,11 @@ export default function HtmlFormatterTool() {
   const exampleHTML = '<div class="container"><h1>Hello World</h1><p>This is a paragraph.</p><ul><li>Item 1</li><li>Item 2</li></ul></div>';
 
   return (
-    <Layout>
-      <ToolLayout
-        title="HTML格式化"
-        description="HTML代码格式化与美化"
-        icon={Code}
-      >
+    <ToolLayout
+      title="HTML格式化"
+      description="HTML代码格式化与美化"
+      icon={Code}
+    >
         <div className="space-y-6">
           {/* Input */}
           <div className="space-y-2">
@@ -146,8 +144,7 @@ export default function HtmlFormatterTool() {
               className="min-h-[200px] font-mono text-sm bg-muted/30"
             />
           </div>
-        </div>
-      </ToolLayout>
-    </Layout>
+      </div>
+    </ToolLayout>
   );
 }

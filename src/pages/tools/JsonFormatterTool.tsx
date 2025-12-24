@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { FileJson, Copy, Check, AlertCircle, Minimize2, Maximize2 } from "lucide-react";
-import { Layout } from "@/components/layout/Layout";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -53,12 +52,11 @@ export default function JsonFormatterTool() {
   };
 
   return (
-    <Layout>
-      <ToolLayout
-        title="JSON格式化"
-        description="JSON格式化、压缩、校验"
-        icon={FileJson}
-      >
+    <ToolLayout
+      title="JSON格式化"
+      description="JSON格式化、压缩、校验"
+      icon={FileJson}
+    >
         <div className="space-y-6">
           {/* Input */}
           <div className="space-y-2">
@@ -126,8 +124,7 @@ export default function JsonFormatterTool() {
               className="min-h-[200px] font-mono text-sm bg-muted/30"
             />
           </div>
-        </div>
-      </ToolLayout>
-    </Layout>
+      </div>
+    </ToolLayout>
   );
 }

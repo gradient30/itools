@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Layout } from "@/components/layout/Layout";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -93,12 +92,11 @@ const GradientTool = () => {
   ];
 
   return (
-    <Layout>
-      <ToolLayout
-        title="颜色渐变生成器"
-        description="创建CSS渐变效果，支持多色节点和预设"
-        icon={Blend}
-      >
+    <ToolLayout
+      title="颜色渐变生成器"
+      description="创建CSS渐变效果，支持多色节点和预设"
+      icon={Blend}
+    >
         <div className="space-y-6">
           {/* Preview */}
           <Card>
@@ -249,9 +247,8 @@ const GradientTool = () => {
               </div>
             </CardContent>
           </Card>
-        </div>
-      </ToolLayout>
-    </Layout>
+      </div>
+    </ToolLayout>
   );
 };
 

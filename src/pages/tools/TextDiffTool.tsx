@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { GitCompare, Trash2 } from "lucide-react";
-import { Layout } from "@/components/layout/Layout";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -90,12 +89,11 @@ export default function TextDiffTool() {
   };
 
   return (
-    <Layout>
-      <ToolLayout
-        title="文本比较"
-        description="对比两段文本的差异"
-        icon={GitCompare}
-      >
+    <ToolLayout
+      title="文本比较"
+      description="对比两段文本的差异"
+      icon={GitCompare}
+    >
         <div className="space-y-6">
           {/* Input Areas */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -203,8 +201,7 @@ export default function TextDiffTool() {
           <div className="p-4 rounded-lg bg-muted/50 border border-border/50 text-sm text-muted-foreground">
             <p>基于行的文本差异比较，使用最长公共子序列(LCS)算法。绿色表示新增行，红色表示删除行。</p>
           </div>
-        </div>
-      </ToolLayout>
-    </Layout>
+      </div>
+    </ToolLayout>
   );
 }

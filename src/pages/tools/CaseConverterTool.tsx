@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { CaseSensitive, Copy, ArrowDown } from "lucide-react";
-import { Layout } from "@/components/layout/Layout";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -76,12 +75,11 @@ export default function CaseConverterTool() {
   };
 
   return (
-    <Layout>
-      <ToolLayout
-        title="大小写转换"
-        description="文本大小写格式转换"
-        icon={CaseSensitive}
-      >
+    <ToolLayout
+      title="大小写转换"
+      description="文本大小写格式转换"
+      icon={CaseSensitive}
+    >
         <div className="space-y-6">
           {/* Input */}
           <div className="space-y-2">
@@ -171,8 +169,7 @@ export default function CaseConverterTool() {
               </div>
             </div>
           )}
-        </div>
-      </ToolLayout>
-    </Layout>
+      </div>
+    </ToolLayout>
   );
 }

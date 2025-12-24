@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Link as LinkIcon, Copy, ArrowDown, ArrowUp } from "lucide-react";
-import { Layout } from "@/components/layout/Layout";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -34,12 +33,11 @@ export default function UrlCodecTool() {
   };
 
   return (
-    <Layout>
-      <ToolLayout
-        title="URL编解码"
-        description="URL参数编码与解码"
-        icon={LinkIcon}
-      >
+    <ToolLayout
+      title="URL编解码"
+      description="URL参数编码与解码"
+      icon={LinkIcon}
+    >
         <div className="space-y-6">
           {/* Decoded Section */}
           <div className="space-y-2">
@@ -107,8 +105,7 @@ export default function UrlCodecTool() {
               <div><code className="text-primary">?</code> → <code>%3F</code></div>
             </div>
           </div>
-        </div>
-      </ToolLayout>
-    </Layout>
+      </div>
+    </ToolLayout>
   );
 }

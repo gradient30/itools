@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { KeyRound, Copy, ArrowDown, ArrowUp } from "lucide-react";
-import { Layout } from "@/components/layout/Layout";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -44,12 +43,11 @@ export default function Base64Tool() {
   };
 
   return (
-    <Layout>
-      <ToolLayout
-        title="Base64编解码"
-        description="Base64编码与解码"
-        icon={KeyRound}
-      >
+    <ToolLayout
+      title="Base64编解码"
+      description="Base64编码与解码"
+      icon={KeyRound}
+    >
         <div className="space-y-6">
           {/* Decoded Section */}
           <div className="space-y-2">
@@ -111,8 +109,7 @@ export default function Base64Tool() {
           <div className="p-4 rounded-lg bg-muted/50 border border-border/50 text-sm text-muted-foreground">
             <p>Base64是一种基于64个可打印字符来表示二进制数据的编码方式，常用于在URL、Cookie、网页中传输少量二进制数据。</p>
           </div>
-        </div>
-      </ToolLayout>
-    </Layout>
+      </div>
+    </ToolLayout>
   );
 }
