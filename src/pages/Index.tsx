@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Layers, Zap, Shield, Sparkles, Megaphone, Calendar, User, FileText } from "lucide-react";
+import { Layers, Zap, Shield, Sparkles, Megaphone, Calendar, User, FileText, Mail, MessageCircle } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { CategorySection } from "@/components/CategorySection";
 import { SearchBox } from "@/components/SearchBox";
@@ -14,7 +14,21 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 
+// 公告版本号 - 每次有新公告时更新此值
+const ANNOUNCEMENT_VERSION = "2025-01-01-v1";
+
 const AnnouncementDialog = () => {
+  const [isRead, setIsRead] = useState(() => {
+    return localStorage.getItem("announcement_read") === ANNOUNCEMENT_VERSION;
+  });
+
+  const handleOpen = (open: boolean) => {
+    if (open && !isRead) {
+      localStorage.setItem("announcement_read", ANNOUNCEMENT_VERSION);
+      setIsRead(true);
+    }
+  };
+
   const currentDate = new Date().toLocaleDateString('zh-CN', {
     year: 'numeric',
     month: 'long',
@@ -22,14 +36,16 @@ const AnnouncementDialog = () => {
   });
 
   return (
-    <Dialog>
+    <Dialog onOpenChange={handleOpen}>
       <DialogTrigger asChild>
         <button 
-          className="relative p-1.5 rounded-full hover:bg-primary/10 transition-colors"
+          className="relative p-1 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors ring-2 ring-primary/30 hover:ring-primary/50"
           title="系统公告"
         >
-          <Megaphone className="h-4 w-4 text-primary" />
-          <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-destructive animate-pulse" />
+          <Megaphone className="h-5 w-5 text-primary" />
+          {!isRead && (
+            <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-destructive animate-pulse ring-2 ring-background" />
+          )}
         </button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
@@ -76,6 +92,26 @@ const AnnouncementDialog = () => {
           </div>
           
           <Separator />
+          
+          {/* 联系方式 */}
+          <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
+            <a 
+              href="https://wpa.qq.com/msgrd?v=3&uin=349487325&site=qq&menu=yes"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 text-muted-foreground hover:text-primary transition-colors"
+            >
+              <MessageCircle className="h-4 w-4" />
+              <span>QQ: 349487325</span>
+            </a>
+            <a 
+              href="mailto:admin@996fb.cn"
+              className="flex items-center gap-1.5 text-muted-foreground hover:text-primary transition-colors"
+            >
+              <Mail className="h-4 w-4" />
+              <span>admin@996fb.cn</span>
+            </a>
+          </div>
           
           {/* 底部提示 */}
           <p className="text-xs text-muted-foreground text-center">
