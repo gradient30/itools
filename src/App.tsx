@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import About from "./pages/About";
 
 // Tool pages - Conversion
 import TimestampTool from "./pages/tools/TimestampTool";
@@ -110,6 +111,9 @@ const App = () => (
             <Route path="/tools/base64-image" element={<Base64ImageTool />} />
             <Route path="/tools/jwt" element={<JwtTool />} />
             <Route path="/tools/gradient" element={<GradientTool />} />
+            
+            {/* About Page */}
+            <Route path="/about" element={<About />} />
             
             {/* Documentation Reference */}
             <Route path="/docs/git" element={<GitReference />} />
