@@ -1,0 +1,25 @@
+# 依赖目录
+node_modules
+
+# 构建产物
+dist
+
+# Git
+.git
+.gitignore
+
+# 开发文件
+*.log
+*.md
+.env*
+.vscode
+.idea
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# 其他
+coverage
+.nyc_output
