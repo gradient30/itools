@@ -80,7 +80,7 @@ const Index = () => {
             <div className="flex flex-wrap justify-center gap-2">
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card/80 border border-border/50 text-xs">
                 <Zap className="h-3 w-3 text-primary" />
-                <span>在线运行</span>
+                <span>本地运行</span>
               </div>
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card/80 border border-border/50 text-xs">
                 <Shield className="h-3 w-3 text-primary" />
@@ -88,7 +88,7 @@ const Index = () => {
               </div>
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card/80 border border-border/50 text-xs">
                 <Sparkles className="h-3 w-3 text-primary" />
-                <span>完全免费</span>
+                <span>内部专用</span>
               </div>
             </div>
           </div>
