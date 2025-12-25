@@ -59,6 +59,7 @@ import CurlReference from "./pages/docs/CurlReference";
 import AsciiReference from "./pages/docs/AsciiReference";
 import ColorsReference from "./pages/docs/ColorsReference";
 import PortsReference from "./pages/docs/PortsReference";
+import SecurityTestingReference from "./pages/docs/SecurityTestingReference";
 
 const queryClient = new QueryClient();
 
@@ -126,6 +127,7 @@ const App = () => (
             <Route path="/docs/ascii" element={<AsciiReference />} />
             <Route path="/docs/colors" element={<ColorsReference />} />
             <Route path="/docs/ports" element={<PortsReference />} />
+            <Route path="/docs/security-testing" element={<SecurityTestingReference />} />
             
             <Route path="*" element={<NotFound />} />
           </Routes>

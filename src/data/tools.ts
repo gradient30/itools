@@ -326,6 +326,12 @@ export const toolCategories: ToolCategory[] = [
         icon: Globe,
         path: "/docs/ports",
       },
+      {
+        name: "安全测试参考",
+        description: "OWASP Top 10与渗透测试速查",
+        icon: Shield,
+        path: "/docs/security-testing",
+      },
     ],
   },
 ];
