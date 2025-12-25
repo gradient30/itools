@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Wrench, Zap, Shield, Sparkles } from "lucide-react";
+import { Layers, Zap, Shield, Sparkles } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { CategorySection } from "@/components/CategorySection";
 import { SearchBox } from "@/components/SearchBox";
@@ -55,7 +55,7 @@ const Index = () => {
             {/* Compact Header with Icon */}
             <div className="flex items-center justify-center gap-4 mb-4">
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary shadow-lg shadow-primary/20">
-                <Wrench className="h-6 w-6 text-primary-foreground" />
+                <Layers className="h-6 w-6 text-primary-foreground" />
               </div>
               <h1 className="text-2xl md:text-3xl font-bold text-foreground">
                 万能工具箱

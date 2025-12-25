@@ -1,4 +1,4 @@
-import { Wrench, Heart } from "lucide-react";
+import { Layers, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export function Footer() {
@@ -9,7 +9,7 @@ export function Footer() {
           {/* Logo & Description */}
           <div className="flex items-center gap-3">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 border border-primary/20">
-              <Wrench className="h-4 w-4 text-primary" />
+              <Layers className="h-4 w-4 text-primary" />
             </div>
             <div>
               <span className="font-semibold text-foreground">万能工具箱</span>
