@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Layers, Zap, Shield, Sparkles } from "lucide-react";
+import { Layers, Zap, Shield, Sparkles, Megaphone, Calendar, User, FileText, X } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { CategorySection } from "@/components/CategorySection";
 import { SearchBox } from "@/components/SearchBox";
@@ -10,6 +10,85 @@ import { HistorySection } from "@/components/HistorySection";
 import { toolCategories, allTools } from "@/data/tools";
 import { useFavorites } from "@/hooks/use-favorites";
 import { useHistory } from "@/hooks/use-history";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+
+const AnnouncementDialog = () => {
+  const currentDate = new Date().toLocaleDateString('zh-CN', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="gap-2 border-primary/30 hover:border-primary hover:bg-primary/5 animate-fade-in"
+        >
+          <Megaphone className="h-4 w-4 text-primary" />
+          <span className="text-sm">系统公告</span>
+          <Badge variant="destructive" className="h-5 px-1.5 text-[10px]">New</Badge>
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-lg">
+            <Megaphone className="h-5 w-5 text-primary" />
+            系统公告
+          </DialogTitle>
+        </DialogHeader>
+        
+        <div className="space-y-4">
+          {/* 公告元信息 */}
+          <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+            <div className="flex items-center gap-1.5">
+              <Calendar className="h-4 w-4" />
+              <span>{currentDate}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <User className="h-4 w-4" />
+              <span>发布人：系统</span>
+            </div>
+          </div>
+          
+          <Separator />
+          
+          {/* 公告正文 */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <FileText className="h-4 w-4 text-primary" />
+              <h4 className="font-semibold text-foreground">更新内容</h4>
+            </div>
+            
+            <div className="rounded-lg border border-border/50 bg-muted/30 p-4 space-y-3">
+              <div className="flex items-start gap-2">
+                <Badge variant="default" className="mt-0.5 shrink-0">新增</Badge>
+                <div>
+                  <p className="font-medium text-foreground">文档参考 - 安全测试参考</p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    新增安全测试参考文档，包含 OWASP Top 10 详细攻击示例、漏洞代码与安全代码对比、测试 Payload、安全响应头配置、安全工具集合及检查清单等内容。
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <Separator />
+          
+          {/* 底部提示 */}
+          <p className="text-xs text-muted-foreground text-center">
+            感谢使用万能工具箱，如有问题或建议请反馈
+          </p>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
 
 const Index = () => {
   const [searchParams] = useSearchParams();
@@ -76,8 +155,8 @@ const Index = () => {
               />
             </div>
 
-            {/* Feature Pills - Inline */}
-            <div className="flex flex-wrap justify-center gap-2">
+            {/* Feature Pills - Inline with Announcement */}
+            <div className="flex flex-wrap justify-center gap-2 items-center">
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card/80 border border-border/50 text-xs">
                 <Zap className="h-3 w-3 text-primary" />
                 <span>本地运行</span>
@@ -90,6 +169,7 @@ const Index = () => {
                 <Sparkles className="h-3 w-3 text-primary" />
                 <span>内部专用</span>
               </div>
+              <AnnouncementDialog />
             </div>
           </div>
         </div>
