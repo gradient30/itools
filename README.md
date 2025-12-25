@@ -1,73 +1,79 @@
-# Welcome to your Lovable project
+# 开发者工具箱
 
-## Project info
+一个功能丰富的在线开发者工具集合，所有工具均在浏览器本地运行，确保数据安全。
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## 功能特点
 
-## How can I edit this code?
+- 🔒 **本地运行** - 所有数据处理在浏览器端完成，不上传服务器
+- 🛡️ **数据安全** - 您的敏感数据永远不会离开您的设备
+- 🏢 **内部专用** - 专为团队内部使用设计
 
-There are several ways of editing your application.
+## 包含工具
 
-**Use Lovable**
+### 编码/解码
+- Base64 编解码
+- URL 编解码
+- JWT 解析
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+### 格式化工具
+- JSON 格式化
+- SQL 格式化
+- HTML 格式化
+- CSS 格式化
+- Markdown 预览
 
-Changes made via Lovable will be committed automatically to this repo.
+### 加密工具
+- MD5 哈希
+- SHA 哈希
+- AES 加密
 
-**Use your preferred IDE**
+### 生成器
+- UUID 生成器
+- 密码生成器
+- 随机字符串
+- 二维码生成
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### 其他工具
+- 时间戳转换
+- 进制转换
+- 正则表达式测试
+- 文本对比
+- 颜色选择器
+- 图片压缩
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## 技术栈
 
-Follow these steps:
+- React 18
+- TypeScript
+- Vite
+- Tailwind CSS
+- shadcn/ui
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 本地开发
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+```bash
+# 克隆仓库
+git clone <仓库地址>
 
-# Step 3: Install the necessary dependencies.
-npm i
+# 进入项目目录
+cd <项目名称>
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# 安装依赖
+npm install
+
+# 启动开发服务器
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## 数据安全说明
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+本工具箱的所有功能均在浏览器端运行，使用 JavaScript 原生 API 进行数据处理：
 
-**Use GitHub Codespaces**
+- ✅ 所有计算在本地完成
+- ✅ 无需网络请求处理数据
+- ✅ 不收集任何用户数据
+- ✅ 不存储任何敏感信息
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 许可证
 
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+内部使用
