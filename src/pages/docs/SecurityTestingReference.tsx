@@ -4,7 +4,9 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Shield, AlertTriangle, Bug, Lock, Terminal, HelpCircle, FileText } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Shield, AlertTriangle, Bug, Lock, Terminal, HelpCircle, FileText, ChevronDown, Code, ShieldCheck, ShieldX, Lightbulb } from "lucide-react";
+import { useState } from "react";
 
 const HelpTip = ({ content }: { content: string }) => (
   <Tooltip>
@@ -17,7 +19,21 @@ const HelpTip = ({ content }: { content: string }) => (
   </Tooltip>
 );
 
+const CodeBlock = ({ code, language = "javascript" }: { code: string; language?: string }) => (
+  <pre className="p-3 bg-muted rounded text-xs font-mono text-foreground overflow-x-auto whitespace-pre-wrap">
+    {code}
+  </pre>
+);
+
 const SecurityTestingReference = () => {
+  const [openItems, setOpenItems] = useState<string[]>([]);
+
+  const toggleItem = (id: string) => {
+    setOpenItems(prev => 
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+    );
+  };
+
   const owaspTop10 = [
     {
       id: "A01",
@@ -32,6 +48,47 @@ const SecurityTestingReference = () => {
         { text: "目录遍历", help: "使用../等路径访问服务器上的敏感文件" },
         { text: "强制浏览", help: "直接访问未链接但存在的页面如/backup、/.git" },
       ],
+      examples: {
+        vulnerable: {
+          title: "漏洞代码 - 缺少权限验证",
+          code: `// ❌ 危险：直接使用用户提供的ID，没有验证所有权
+app.get('/api/orders/:orderId', async (req, res) => {
+  const order = await db.query(
+    'SELECT * FROM orders WHERE id = $1', 
+    [req.params.orderId]
+  );
+  res.json(order); // 任何人都可以查看任意订单
+});
+
+// ❌ 危险：前端控制权限（攻击者可直接调用API）
+{isAdmin && <button onClick={deleteUser}>删除用户</button>}`,
+        },
+        secure: {
+          title: "安全代码 - 严格权限验证",
+          code: `// ✅ 安全：验证资源所有权
+app.get('/api/orders/:orderId', authenticate, async (req, res) => {
+  const order = await db.query(
+    'SELECT * FROM orders WHERE id = $1 AND user_id = $2',
+    [req.params.orderId, req.user.id] // 只能查看自己的订单
+  );
+  if (!order) return res.status(403).json({ error: 'Forbidden' });
+  res.json(order);
+});
+
+// ✅ 安全：后端验证管理员权限
+app.delete('/api/users/:id', authenticate, requireAdmin, async (req, res) => {
+  // requireAdmin中间件确保只有管理员可以执行
+  await db.query('DELETE FROM users WHERE id = $1', [req.params.id]);
+  res.json({ success: true });
+});`,
+        },
+        tips: [
+          "始终在服务端验证用户权限，不要依赖前端隐藏",
+          "使用 session 中的用户 ID 而不是用户提供的 ID",
+          "实施 RBAC（基于角色的访问控制）",
+          "记录所有访问控制失败的日志",
+        ],
+      },
     },
     {
       id: "A02",
@@ -46,6 +103,51 @@ const SecurityTestingReference = () => {
         { text: "API密钥暴露扫描", help: "检查代码和Git历史中是否泄露密钥" },
         { text: "Cookie安全属性", help: "验证Secure、HttpOnly、SameSite属性" },
       ],
+      examples: {
+        vulnerable: {
+          title: "漏洞代码 - 不安全的加密实践",
+          code: `// ❌ 危险：明文存储密码
+await db.query('INSERT INTO users (password) VALUES ($1)', [password]);
+
+// ❌ 危险：使用 MD5 哈希密码（可被彩虹表破解）
+const hash = crypto.createHash('md5').update(password).digest('hex');
+
+// ❌ 危险：硬编码密钥
+const secretKey = 'my-secret-key-12345';
+const encrypted = CryptoJS.AES.encrypt(data, secretKey);
+
+// ❌ 危险：不安全的 Cookie
+res.cookie('sessionId', token);`,
+        },
+        secure: {
+          title: "安全代码 - 正确的加密实践",
+          code: `// ✅ 安全：使用 bcrypt 哈希密码（自动加盐）
+import bcrypt from 'bcrypt';
+const saltRounds = 12;
+const hash = await bcrypt.hash(password, saltRounds);
+
+// ✅ 安全：验证密码
+const isValid = await bcrypt.compare(inputPassword, storedHash);
+
+// ✅ 安全：从环境变量读取密钥
+const secretKey = process.env.ENCRYPTION_KEY;
+if (!secretKey) throw new Error('ENCRYPTION_KEY not configured');
+
+// ✅ 安全：安全的 Cookie 设置
+res.cookie('sessionId', token, {
+  httpOnly: true,   // 防止 XSS 读取
+  secure: true,     // 仅 HTTPS 传输
+  sameSite: 'strict', // 防止 CSRF
+  maxAge: 3600000   // 1小时过期
+});`,
+        },
+        tips: [
+          "密码使用 bcrypt/argon2/scrypt，不要用 MD5/SHA1",
+          "传输敏感数据必须使用 TLS 1.2+",
+          "密钥存储在环境变量或密钥管理服务中",
+          "定期轮换加密密钥",
+        ],
+      },
     },
     {
       id: "A03",
@@ -60,6 +162,47 @@ const SecurityTestingReference = () => {
         { text: "LDAP注入", help: "篡改LDAP查询获取未授权信息" },
         { text: "NoSQL注入", help: "针对MongoDB等NoSQL数据库的注入攻击" },
       ],
+      examples: {
+        vulnerable: {
+          title: "漏洞代码 - SQL注入/XSS/命令注入",
+          code: `// ❌ SQL注入：直接拼接用户输入
+const query = "SELECT * FROM users WHERE name = '" + username + "'";
+// 攻击者输入: ' OR '1'='1' -- 可绕过认证
+
+// ❌ XSS：直接渲染用户输入
+<div dangerouslySetInnerHTML={{__html: userComment}} />
+// 攻击者输入: <script>steal(document.cookie)</script>
+
+// ❌ 命令注入：拼接命令参数
+exec(\`ping \${userInput}\`);
+// 攻击者输入: 127.0.0.1; rm -rf /`,
+        },
+        secure: {
+          title: "安全代码 - 参数化查询/输出编码",
+          code: `// ✅ SQL：使用参数化查询（预处理语句）
+const query = 'SELECT * FROM users WHERE name = $1';
+await db.query(query, [username]); // 参数自动转义
+
+// ✅ XSS防护：使用文本节点或转义
+<div>{userComment}</div> // React自动转义
+// 或使用 DOMPurify 清理 HTML
+import DOMPurify from 'dompurify';
+<div dangerouslySetInnerHTML={{__html: DOMPurify.sanitize(html)}} />
+
+// ✅ 命令注入防护：使用白名单或专用库
+import { execFile } from 'child_process';
+const allowed = ['google.com', 'localhost'];
+if (allowed.includes(host)) {
+  execFile('ping', ['-c', '4', host]); // 参数分离
+}`,
+        },
+        tips: [
+          "永远使用参数化查询，不要拼接 SQL",
+          "输出到 HTML 时进行上下文相关的编码",
+          "使用 ORM 框架减少直接 SQL 操作",
+          "实施输入验证白名单策略",
+        ],
+      },
     },
     {
       id: "A04",
@@ -73,6 +216,56 @@ const SecurityTestingReference = () => {
         { text: "安全需求审查", help: "验证安全需求是否在设计中体现" },
         { text: "数据流分析", help: "追踪敏感数据在系统中的流向" },
       ],
+      examples: {
+        vulnerable: {
+          title: "漏洞设计 - 业务逻辑缺陷",
+          code: `// ❌ 危险：前端计算价格，后端直接信任
+// 前端
+const total = quantity * price;
+fetch('/api/order', { body: { total } });
+// 攻击者可以修改 total 为 0.01
+
+// ❌ 危险：允许无限次密码尝试
+app.post('/login', async (req, res) => {
+  const user = await checkPassword(req.body);
+  // 攻击者可以暴力破解密码
+});
+
+// ❌ 危险：密码重置链接永不过期
+const resetToken = generateToken();
+await db.query('UPDATE users SET reset_token = $1', [resetToken]);`,
+        },
+        secure: {
+          title: "安全设计 - 防御性设计",
+          code: `// ✅ 安全：服务端计算价格
+app.post('/api/order', async (req, res) => {
+  const product = await db.getProduct(req.body.productId);
+  const total = product.price * req.body.quantity; // 服务端计算
+  // 验证库存、用户余额等
+});
+
+// ✅ 安全：限制登录尝试次数
+import rateLimit from 'express-rate-limit';
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15分钟
+  max: 5, // 最多5次
+  message: '尝试次数过多，请稍后再试'
+});
+app.post('/login', loginLimiter, handleLogin);
+
+// ✅ 安全：重置令牌有时效
+const resetToken = generateSecureToken();
+const expiresAt = Date.now() + 3600000; // 1小时后过期
+await db.query('UPDATE users SET reset_token=$1, token_expires=$2', 
+  [resetToken, expiresAt]);`,
+        },
+        tips: [
+          "关键业务逻辑（价格、库存）必须服务端验证",
+          "实施速率限制防止暴力破解",
+          "设计时进行威胁建模",
+          "敏感操作需要多步验证",
+        ],
+      },
     },
     {
       id: "A05",
@@ -87,6 +280,58 @@ const SecurityTestingReference = () => {
         { text: "不必要的服务/端口", help: "扫描并关闭不需要的网络服务" },
         { text: "HTTP方法测试", help: "检查是否启用了PUT、DELETE、TRACE等危险方法" },
       ],
+      examples: {
+        vulnerable: {
+          title: "漏洞配置 - 暴露敏感信息",
+          code: `// ❌ 危险：生产环境开启调试模式
+app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+
+// ❌ 危险：暴露详细错误给用户
+app.use((err, req, res, next) => {
+  res.status(500).json({ 
+    error: err.message, 
+    stack: err.stack // 暴露堆栈跟踪
+  });
+});
+
+// ❌ 危险：CORS 配置过于宽松
+app.use(cors({ origin: '*' }));
+
+// ❌ 危险：使用默认密钥
+const session = require('express-session');
+app.use(session({ secret: 'keyboard cat' }));`,
+        },
+        secure: {
+          title: "安全配置 - 最小权限原则",
+          code: `// ✅ 安全：生产环境隐藏错误细节
+app.use((err, req, res, next) => {
+  console.error(err); // 服务端记录详细错误
+  res.status(500).json({ error: '服务器错误，请联系管理员' });
+});
+
+// ✅ 安全：严格的 CORS 配置
+app.use(cors({
+  origin: ['https://myapp.com', 'https://admin.myapp.com'],
+  methods: ['GET', 'POST'],
+  credentials: true
+}));
+
+// ✅ 安全：使用强随机密钥
+app.use(session({ 
+  secret: process.env.SESSION_SECRET, // 至少32字节随机字符串
+  cookie: { secure: true, httpOnly: true }
+}));
+
+// ✅ 安全：隐藏服务器信息
+app.disable('x-powered-by');`,
+        },
+        tips: [
+          "移除或禁用所有默认账户和密码",
+          "生产环境关闭调试模式和详细错误信息",
+          "定期审计和更新安全配置",
+          "使用安全加固清单检查配置",
+        ],
+      },
     },
     {
       id: "A06",
@@ -100,6 +345,51 @@ const SecurityTestingReference = () => {
         { text: "CVE漏洞扫描", help: "对照CVE数据库检查已知漏洞" },
         { text: "软件清单(SBOM)", help: "生成并审查软件物料清单" },
       ],
+      examples: {
+        vulnerable: {
+          title: "漏洞示例 - 使用过时依赖",
+          code: `// package.json - 使用有漏洞的版本
+{
+  "dependencies": {
+    "lodash": "4.17.15",    // CVE-2020-8203 原型污染
+    "axios": "0.18.0",       // SSRF 漏洞
+    "node-serialize": "0.0.4" // 远程代码执行
+  }
+}
+
+// ❌ 危险：忽略安全警告
+npm install --legacy-peer-deps --force
+// 跳过所有兼容性和安全检查`,
+        },
+        secure: {
+          title: "安全实践 - 依赖管理",
+          code: `# ✅ 安全：定期检查和更新依赖
+npm audit                    # 检查漏洞
+npm audit fix               # 自动修复
+npm update                  # 更新依赖
+
+# ✅ 安全：使用 lock 文件锁定版本
+npm ci                      # 严格按照 lock 文件安装
+
+# ✅ 安全：设置 CI/CD 自动检查
+# .github/workflows/security.yml
+name: Security
+on: [push, pull_request]
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: npm ci
+      - run: npm audit --audit-level=high`,
+        },
+        tips: [
+          "定期运行 npm audit 并修复发现的问题",
+          "订阅依赖库的安全通告",
+          "使用 Dependabot/Renovate 自动更新",
+          "维护软件物料清单 (SBOM)",
+        ],
+      },
     },
     {
       id: "A07",
@@ -115,6 +405,55 @@ const SecurityTestingReference = () => {
         { text: "多因素认证", help: "验证MFA实现是否可被绕过" },
         { text: "密码重置流程", help: "检查重置链接是否一次性且有时效" },
       ],
+      examples: {
+        vulnerable: {
+          title: "漏洞代码 - 不安全的认证",
+          code: `// ❌ 危险：允许弱密码
+const isValidPassword = password.length >= 4;
+
+// ❌ 危险：登录后不更新 Session ID（会话固定攻击）
+app.post('/login', (req, res) => {
+  // 验证成功后直接使用已有 session
+  req.session.userId = user.id;
+});
+
+// ❌ 危险：JWT 存储在 localStorage（XSS 可窃取）
+localStorage.setItem('token', jwt);
+
+// ❌ 危险：密码重置令牌可预测
+const resetToken = Date.now().toString();`,
+        },
+        secure: {
+          title: "安全代码 - 健壮的认证",
+          code: `// ✅ 安全：强密码策略
+import zxcvbn from 'zxcvbn';
+const result = zxcvbn(password);
+if (result.score < 3) {
+  return { error: '密码强度不足', suggestions: result.feedback.suggestions };
+}
+
+// ✅ 安全：登录后重新生成 Session ID
+app.post('/login', (req, res) => {
+  req.session.regenerate((err) => {
+    req.session.userId = user.id;
+    res.json({ success: true });
+  });
+});
+
+// ✅ 安全：JWT 存储在 HttpOnly Cookie
+res.cookie('token', jwt, { httpOnly: true, secure: true, sameSite: 'strict' });
+
+// ✅ 安全：加密随机令牌
+import crypto from 'crypto';
+const resetToken = crypto.randomBytes(32).toString('hex');`,
+        },
+        tips: [
+          "使用密码强度评估库如 zxcvbn",
+          "登录后必须重新生成 Session ID",
+          "实施账户锁定和异常登录检测",
+          "敏感操作启用多因素认证",
+        ],
+      },
     },
     {
       id: "A08",
@@ -128,6 +467,48 @@ const SecurityTestingReference = () => {
         { text: "反序列化攻击", help: "检查是否安全处理序列化数据" },
         { text: "代码签名验证", help: "验证发布包的数字签名" },
       ],
+      examples: {
+        vulnerable: {
+          title: "漏洞示例 - 完整性验证缺失",
+          code: `// ❌ 危险：不安全的反序列化
+const obj = JSON.parse(userInput);
+eval(obj.code); // 远程代码执行
+
+// ❌ 危险：从不可信源加载脚本
+<script src="http://cdn.example.com/lib.js"></script>
+
+// ❌ 危险：CI/CD 使用可变版本
+# GitHub Actions
+- uses: actions/checkout@main  # main 可能被篡改`,
+        },
+        secure: {
+          title: "安全实践 - 验证完整性",
+          code: `// ✅ 安全：只解析数据，不执行代码
+const obj = JSON.parse(userInput);
+// 使用白名单验证预期字段
+const { name, email } = obj;
+
+// ✅ 安全：使用 SRI 验证第三方脚本
+<script 
+  src="https://cdn.example.com/lib.js"
+  integrity="sha384-abc123..."
+  crossorigin="anonymous"
+></script>
+
+// ✅ 安全：CI/CD 锁定版本哈希
+# GitHub Actions
+- uses: actions/checkout@8e5e7e5ab8c8f (具体 commit SHA)
+
+// ✅ 安全：验证依赖完整性
+npm ci --ignore-scripts  # 使用 lock 文件，跳过潜在危险的安装脚本`,
+        },
+        tips: [
+          "使用 SRI 验证外部脚本完整性",
+          "CI/CD 中使用固定版本或 commit SHA",
+          "代码签名和发布包验证",
+          "限制反序列化数据的来源和内容",
+        ],
+      },
     },
     {
       id: "A09",
@@ -141,6 +522,54 @@ const SecurityTestingReference = () => {
         { text: "日志注入测试", help: "验证日志内容是否被正确转义" },
         { text: "日志保留策略", help: "确认日志保留时间满足合规要求" },
       ],
+      examples: {
+        vulnerable: {
+          title: "漏洞示例 - 日志记录不足",
+          code: `// ❌ 危险：登录失败不记录
+app.post('/login', (req, res) => {
+  if (!valid) return res.status(401).send('Invalid');
+  // 攻击者暴力破解不会被发现
+});
+
+// ❌ 危险：记录敏感信息
+console.log('Login:', { username, password }); // 密码泄露
+
+// ❌ 危险：日志注入
+console.log('User: ' + userInput);
+// 攻击者输入: "admin\\n[INFO] User logged in as admin"`,
+        },
+        secure: {
+          title: "安全实践 - 全面的日志监控",
+          code: `// ✅ 安全：记录安全事件（不含敏感数据）
+import winston from 'winston';
+const logger = winston.createLogger({ /* config */ });
+
+app.post('/login', (req, res) => {
+  if (!valid) {
+    logger.warn('Login failed', {
+      username: req.body.username,
+      ip: req.ip,
+      userAgent: req.get('User-Agent'),
+      timestamp: new Date().toISOString()
+    });
+    // 触发告警（如连续失败超过5次）
+    checkBruteForce(req.body.username, req.ip);
+    return res.status(401).send('Invalid credentials');
+  }
+  logger.info('Login success', { username: req.body.username, ip: req.ip });
+});
+
+// ✅ 安全：日志转义防注入
+const sanitized = userInput.replace(/[\\n\\r]/g, '_');
+logger.info('User action', { user: sanitized });`,
+        },
+        tips: [
+          "记录所有认证事件（成功和失败）",
+          "日志中不要包含密码、Token 等敏感信息",
+          "设置异常行为告警阈值",
+          "日志集中管理并保留足够时间",
+        ],
+      },
     },
     {
       id: "A10",
@@ -154,6 +583,60 @@ const SecurityTestingReference = () => {
         { text: "协议走私测试", help: "使用file://、gopher://等协议绕过限制" },
         { text: "DNS重绑定", help: "通过DNS解析变化绕过IP白名单" },
       ],
+      examples: {
+        vulnerable: {
+          title: "漏洞代码 - SSRF 漏洞",
+          code: `// ❌ 危险：直接使用用户提供的 URL
+app.get('/fetch', async (req, res) => {
+  const response = await fetch(req.query.url);
+  res.send(await response.text());
+});
+// 攻击者可以：
+// - 访问 http://169.254.169.254/latest/meta-data/ 获取 AWS 凭证
+// - 访问 http://192.168.1.1/admin 探测内网
+// - 使用 file:///etc/passwd 读取本地文件`,
+        },
+        secure: {
+          title: "安全代码 - SSRF 防护",
+          code: `import { URL } from 'url';
+
+// ✅ 安全：白名单验证 + URL 解析
+const ALLOWED_HOSTS = ['api.example.com', 'cdn.example.com'];
+
+app.get('/fetch', async (req, res) => {
+  try {
+    const url = new URL(req.query.url);
+    
+    // 1. 只允许 HTTPS
+    if (url.protocol !== 'https:') {
+      return res.status(400).json({ error: 'Only HTTPS allowed' });
+    }
+    
+    // 2. 白名单验证
+    if (!ALLOWED_HOSTS.includes(url.hostname)) {
+      return res.status(400).json({ error: 'Host not allowed' });
+    }
+    
+    // 3. 禁止内网 IP（包括各种变体）
+    const ip = await dns.resolve(url.hostname);
+    if (isPrivateIP(ip)) {
+      return res.status(400).json({ error: 'Private IP not allowed' });
+    }
+    
+    const response = await fetch(url.href, { timeout: 5000 });
+    res.send(await response.text());
+  } catch (e) {
+    res.status(400).json({ error: 'Invalid URL' });
+  }
+});`,
+        },
+        tips: [
+          "使用 URL 白名单限制可访问的目标",
+          "禁止 file://、gopher:// 等危险协议",
+          "验证解析后的 IP 地址不是内网地址",
+          "云环境中禁用元数据服务或使用 IMDSv2",
+        ],
+      },
     },
   ];
 
@@ -358,7 +841,7 @@ const SecurityTestingReference = () => {
         </TabsList>
 
         <TabsContent value="owasp" className="mt-6">
-          <ScrollArea className="h-[600px]">
+          <ScrollArea className="h-[700px]">
             <div className="grid gap-4">
               {owaspTop10.map((item) => (
                 <Card key={item.id} className="border-border/50">
@@ -376,7 +859,8 @@ const SecurityTestingReference = () => {
                       </Badge>
                     </div>
                     <p className="text-sm text-muted-foreground mb-3">{item.description}</p>
-                    <div className="space-y-1">
+                    
+                    <div className="space-y-1 mb-4">
                       <p className="text-xs font-medium text-muted-foreground">测试要点:</p>
                       <ul className="grid grid-cols-1 md:grid-cols-2 gap-1">
                         {item.tests.map((test, i) => (
@@ -390,6 +874,50 @@ const SecurityTestingReference = () => {
                         ))}
                       </ul>
                     </div>
+
+                    {/* 详细代码示例 */}
+                    <Collapsible open={openItems.includes(item.id)} onOpenChange={() => toggleItem(item.id)}>
+                      <CollapsibleTrigger className="flex items-center gap-2 text-sm font-medium text-primary hover:underline cursor-pointer w-full justify-center py-2 border-t border-border/50">
+                        <Code className="h-4 w-4" />
+                        查看详细代码示例
+                        <ChevronDown className={`h-4 w-4 transition-transform ${openItems.includes(item.id) ? 'rotate-180' : ''}`} />
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="mt-4 space-y-4">
+                        {/* 漏洞代码 */}
+                        <div className="border border-destructive/30 rounded-lg p-4 bg-destructive/5">
+                          <div className="flex items-center gap-2 mb-3">
+                            <ShieldX className="h-4 w-4 text-destructive" />
+                            <h4 className="font-semibold text-destructive text-sm">{item.examples.vulnerable.title}</h4>
+                          </div>
+                          <CodeBlock code={item.examples.vulnerable.code} />
+                        </div>
+
+                        {/* 安全代码 */}
+                        <div className="border border-green-500/30 rounded-lg p-4 bg-green-500/5">
+                          <div className="flex items-center gap-2 mb-3">
+                            <ShieldCheck className="h-4 w-4 text-green-600" />
+                            <h4 className="font-semibold text-green-600 text-sm">{item.examples.secure.title}</h4>
+                          </div>
+                          <CodeBlock code={item.examples.secure.code} />
+                        </div>
+
+                        {/* 修复建议 */}
+                        <div className="border border-primary/30 rounded-lg p-4 bg-primary/5">
+                          <div className="flex items-center gap-2 mb-3">
+                            <Lightbulb className="h-4 w-4 text-primary" />
+                            <h4 className="font-semibold text-primary text-sm">修复建议</h4>
+                          </div>
+                          <ul className="space-y-1">
+                            {item.examples.tips.map((tip, i) => (
+                              <li key={i} className="text-sm text-foreground flex items-start gap-2">
+                                <span className="text-primary mt-1">•</span>
+                                {tip}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </CollapsibleContent>
+                    </Collapsible>
                   </CardContent>
                 </Card>
               ))}
