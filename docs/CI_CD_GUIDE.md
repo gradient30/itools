@@ -1,46 +1,48 @@
 # CI/CD 部署指南
 
-本项目支持 GitHub Actions 和 GitLab CI/CD 两种自动化构建部署方式。
+本项目支持 GitHub Pages 自动部署、GitHub Actions Docker 构建和 GitLab CI/CD 三种自动化方式。
 
-## GitHub Actions
+---
+
+## GitHub Pages 自动部署（推荐）
 
 ### 功能特性
 
-- 自动构建 Docker 镜像
-- 推送镜像到 GitHub Container Registry (ghcr.io)
-- 支持多种标签策略（分支名、版本号、commit SHA）
-- 使用 Docker 层缓存加速构建
+- Push 代码后自动构建并部署到 GitHub Pages
+- 无需服务器，完全免费
+- 自动生成静态网站 URL
 
 ### 触发条件
 
-| 事件 | 分支/标签 | 动作 |
-|------|-----------|------|
-| Push | main/master | 构建并推送镜像 |
-| Push | v* 标签 | 构建并推送带版本号的镜像 |
-| Pull Request | main/master | 仅构建，不推送 |
+| 事件 | 分支 | 动作 |
+|------|------|------|
+| Push | main/master | 自动构建并部署 |
+| 手动触发 | - | 可在 Actions 页面手动运行 |
 
-### 镜像标签规则
+### 启用步骤
 
-- `ghcr.io/用户名/仓库名:main` - 主分支最新
-- `ghcr.io/用户名/仓库名:v1.0.0` - 版本标签
-- `ghcr.io/用户名/仓库名:sha-abc123` - Commit SHA
+1. **启用 GitHub Pages**：
+   - 进入仓库 **Settings → Pages**
+   - Source 选择 **GitHub Actions**
 
-### 使用方法
-
-1. **无需额外配置**，GitHub Actions 自动使用 `GITHUB_TOKEN`
-
-2. **拉取镜像**：
+2. **推送代码**：
    ```bash
-   docker pull ghcr.io/你的用户名/devtools:latest
+   git add .
+   git commit -m "Enable GitHub Pages"
+   git push origin main
    ```
 
-3. **发布新版本**：
-   ```bash
-   git tag v1.0.0
-   git push origin v1.0.0
-   ```
+3. **查看部署状态**：
+   - 进入 **Actions** 标签页查看构建进度
+   - 部署成功后访问：`https://gradient30.github.io/your-model-now/`
+
+### 工作流文件
+
+`.github/workflows/deploy-pages.yml` - 自动构建 Vite 项目并部署到 GitHub Pages
 
 ---
+
+## GitHub Actions Docker 构建
 
 ## GitLab CI/CD
 
