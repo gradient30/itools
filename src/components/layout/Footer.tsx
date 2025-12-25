@@ -22,9 +22,6 @@ export function Footer() {
             <Link to="/" className="hover:text-primary transition-colors">
               首页
             </Link>
-            <Link to="/about" className="hover:text-primary transition-colors">
-              关于
-            </Link>
           </div>
 
           {/* Copyright */}
