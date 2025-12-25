@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Layers, Zap, Shield, Sparkles, Megaphone, Calendar, User, FileText, X } from "lucide-react";
+import { Layers, Zap, Shield, Sparkles, Megaphone, Calendar, User, FileText } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { CategorySection } from "@/components/CategorySection";
 import { SearchBox } from "@/components/SearchBox";
@@ -11,7 +11,6 @@ import { toolCategories, allTools } from "@/data/tools";
 import { useFavorites } from "@/hooks/use-favorites";
 import { useHistory } from "@/hooks/use-history";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 
@@ -25,15 +24,13 @@ const AnnouncementDialog = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="gap-2 border-primary/30 hover:border-primary hover:bg-primary/5 animate-fade-in"
+        <button 
+          className="relative p-1.5 rounded-full hover:bg-primary/10 transition-colors"
+          title="系统公告"
         >
           <Megaphone className="h-4 w-4 text-primary" />
-          <span className="text-sm">系统公告</span>
-          <Badge variant="destructive" className="h-5 px-1.5 text-[10px]">New</Badge>
-        </Button>
+          <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-destructive animate-pulse" />
+        </button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
@@ -136,9 +133,14 @@ const Index = () => {
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary shadow-lg shadow-primary/20">
                 <Layers className="h-6 w-6 text-primary-foreground" />
               </div>
-              <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-                万能工具箱
-              </h1>
+              <div className="relative">
+                <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+                  万能工具箱
+                </h1>
+                <div className="absolute -top-1 -right-6">
+                  <AnnouncementDialog />
+                </div>
+              </div>
             </div>
 
             {/* Subtitle */}
@@ -155,7 +157,6 @@ const Index = () => {
               />
             </div>
 
-            {/* Feature Pills - Inline with Announcement */}
             <div className="flex flex-wrap justify-center gap-2 items-center">
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card/80 border border-border/50 text-xs">
                 <Zap className="h-3 w-3 text-primary" />
@@ -169,7 +170,6 @@ const Index = () => {
                 <Sparkles className="h-3 w-3 text-primary" />
                 <span>内部专用</span>
               </div>
-              <AnnouncementDialog />
             </div>
           </div>
         </div>
