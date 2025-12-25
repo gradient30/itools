@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Search, Menu, X, Wrench } from "lucide-react";
+import { Search, Menu, X, Layers } from "lucide-react";
 import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,7 +33,7 @@ export function Header() {
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 hover-glow rounded-lg px-2 py-1">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary tech-glow-sm">
-            <Wrench className="h-5 w-5 text-primary-foreground" />
+            <Layers className="h-5 w-5 text-primary-foreground" />
           </div>
           <span className="text-xl font-bold bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
             万能工具箱
