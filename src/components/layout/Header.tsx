@@ -80,13 +80,6 @@ export function Header() {
               ))}
             </NavigationMenuList>
           </NavigationMenu>
-          
-          <Link 
-            to="/about" 
-            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-          >
-            关于
-          </Link>
         </div>
 
         {/* Search & Theme Toggle & Mobile Menu */}
