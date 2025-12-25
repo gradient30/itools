@@ -36,7 +36,7 @@ jobs:
         run: npm run build
         env:
           # 设置 base URL 为仓库名（GitHub Pages 需要）
-          VITE_BASE_URL: /your-model-now/
+          VITE_BASE_URL: /itools/
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
