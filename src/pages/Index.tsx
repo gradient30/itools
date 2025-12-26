@@ -96,20 +96,18 @@ const AnnouncementDialog = () => {
           {/* 联系方式 */}
           <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
             <a 
-              href="https://wpa.qq.com/msgrd?v=3&uin=349487325&site=qq&menu=yes"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="tencent://message/?uin=349487325"
               className="flex items-center gap-1.5 text-muted-foreground hover:text-primary transition-colors"
             >
               <MessageCircle className="h-4 w-4" />
-              <span>QQ: 349487325</span>
+              <span>QQ</span>
             </a>
             <a 
               href="mailto:admin@996fb.cn"
               className="flex items-center gap-1.5 text-muted-foreground hover:text-primary transition-colors"
             >
               <Mail className="h-4 w-4" />
-              <span>admin@996fb.cn</span>
+              <span>邮箱</span>
             </a>
           </div>
           
