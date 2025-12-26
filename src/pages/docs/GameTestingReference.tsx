@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { TestCaseExporter } from "@/components/TestCaseExporter";
 import { 
   Gamepad2, 
   Target, 
@@ -695,6 +696,24 @@ const GameTestingReference = () => {
       description="SaaS游戏平台与应用测试方法论，包含黑盒测试技术、探索式测试、风险测试及行业最佳实践"
       icon={Gamepad2}
     >
+      {/* 导出模板区域 */}
+      <Card className="border-primary/20 mb-6">
+        <CardHeader className="pb-3">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <FileText className="h-5 w-5 text-primary" />
+                测试用例模板导出
+              </CardTitle>
+              <p className="text-sm text-muted-foreground mt-1">
+                下载游戏测试用例模板，支持Excel和Markdown格式
+              </p>
+            </div>
+            <TestCaseExporter />
+          </div>
+        </CardHeader>
+      </Card>
+
       <Tabs defaultValue="blackbox" className="w-full">
         <TabsList className="grid grid-cols-2 md:grid-cols-5 w-full h-auto gap-1 bg-muted/50 p-1">
           <TabsTrigger value="blackbox" className="text-xs md:text-sm">黑盒测试技术</TabsTrigger>
