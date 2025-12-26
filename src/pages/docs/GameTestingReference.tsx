@@ -38,233 +38,409 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
-// 黑盒测试技术
+// 黑盒测试技术 - 专业增强版
 const blackBoxTechniques = [
   {
     id: "equivalence",
     name: "等价类划分",
     icon: Layers,
-    description: "将输入数据划分为若干等价类，从每个类中选取代表性数据进行测试",
+    description: "将输入数据划分为若干等价类，从每个类中选取代表性数据进行测试，是最基础也最重要的黑盒测试技术",
     principles: [
-      "有效等价类：符合程序规格说明的合理输入",
-      "无效等价类：不符合规格说明的异常输入",
-      "每个等价类中的数据对发现错误的能力相同",
-      "减少测试用例数量，同时保证测试覆盖率"
+      "有效等价类：符合程序规格说明的合理输入数据集合",
+      "无效等价类：不符合规格说明的异常/边缘输入数据集合",
+      "等价类内的数据对发现同类错误的能力是等效的",
+      "原则：每个等价类至少选取一个代表值进行测试",
+      "组合原则：有效类可组合测试，无效类需单独测试"
     ],
     gameExamples: [
       {
-        scenario: "游戏角色等级系统",
+        scenario: "角色名称创建系统",
         validClasses: [
-          { class: "1-10级（新手期）", testValue: "5", description: "新手保护机制验证" },
-          { class: "11-50级（成长期）", testValue: "30", description: "常规功能可用性" },
-          { class: "51-99级（进阶期）", testValue: "75", description: "高级功能解锁验证" },
-          { class: "100级（满级）", testValue: "100", description: "满级特权验证" }
+          { class: "纯中文（2-6字）", testValue: "游戏玩家", description: "正常创建，存储正确" },
+          { class: "纯英文（4-12位）", testValue: "GamePlayer", description: "正常创建，大小写保留" },
+          { class: "中英混合", testValue: "玩家Player", description: "正常创建，混合显示" },
+          { class: "含数字组合", testValue: "玩家2024", description: "正常创建，数字有效" }
         ],
         invalidClasses: [
-          { class: "负数等级", testValue: "-1", description: "应提示等级无效" },
-          { class: "超过最大等级", testValue: "101", description: "应限制最大等级" },
-          { class: "非数字输入", testValue: "abc", description: "应提示格式错误" },
-          { class: "小数等级", testValue: "50.5", description: "应取整或提示错误" }
+          { class: "过短（<2字符）", testValue: "我", description: "提示：名称长度不足" },
+          { class: "过长（>12字符）", testValue: "这是一个非常长的游戏角色名称", description: "提示：名称超出限制" },
+          { class: "含特殊字符", testValue: "玩家@#$%", description: "提示：包含非法字符" },
+          { class: "系统敏感词", testValue: "admin管理员", description: "提示：名称不可用" },
+          { class: "纯空格/空白", testValue: "   ", description: "提示：请输入有效名称" },
+          { class: "含emoji表情", testValue: "玩家😀", description: "根据策略：过滤或拒绝" }
         ]
       },
       {
-        scenario: "充值金额验证",
+        scenario: "充值金额验证系统",
         validClasses: [
-          { class: "最小充值额（6元）", testValue: "6", description: "最低门槛验证" },
-          { class: "常规充值（6-648元）", testValue: "98", description: "正常充值流程" },
-          { class: "大额充值（648元）", testValue: "648", description: "大额支付验证" }
+          { class: "最小档位（6元）", testValue: "6", description: "充值成功，到账60钻石" },
+          { class: "常规档位（30元）", testValue: "30", description: "充值成功，到账300+赠送30" },
+          { class: "中档（98元）", testValue: "98", description: "充值成功，到账980+赠送100" },
+          { class: "大额档位（648元）", testValue: "648", description: "充值成功，到账6480+赠送1000" }
         ],
         invalidClasses: [
-          { class: "低于最小金额", testValue: "1", description: "应提示金额不足" },
-          { class: "负数金额", testValue: "-100", description: "应拒绝交易" },
-          { class: "超大金额", testValue: "99999", description: "应触发风控" }
+          { class: "低于最低金额", testValue: "1", description: "提示：最低充值6元" },
+          { class: "负数金额", testValue: "-100", description: "系统拒绝，订单创建失败" },
+          { class: "非标准金额", testValue: "7.5", description: "提示：请选择有效档位" },
+          { class: "超大金额", testValue: "100000", description: "触发风控，需人工审核" }
         ]
       },
       {
-        scenario: "用户名注册",
+        scenario: "邮箱格式验证",
         validClasses: [
-          { class: "纯字母（4-16位）", testValue: "GamePlayer", description: "正常注册" },
-          { class: "字母+数字组合", testValue: "Player2024", description: "正常注册" },
-          { class: "含中文昵称", testValue: "游戏玩家01", description: "中文支持验证" }
+          { class: "标准邮箱格式", testValue: "user@game.com", description: "验证通过" },
+          { class: "含数字用户名", testValue: "user123@game.com", description: "验证通过" },
+          { class: "含点号用户名", testValue: "user.name@game.com", description: "验证通过" }
         ],
         invalidClasses: [
-          { class: "过短（<4位）", testValue: "abc", description: "提示长度不足" },
-          { class: "过长（>16位）", testValue: "abcdefghijklmnopqrst", description: "提示超出限制" },
-          { class: "含特殊字符", testValue: "Player@#$", description: "提示含非法字符" },
-          { class: "敏感词", testValue: "admin", description: "提示不可用" }
+          { class: "缺少@符号", testValue: "usergame.com", description: "提示：邮箱格式错误" },
+          { class: "缺少域名", testValue: "user@", description: "提示：邮箱格式不完整" },
+          { class: "多个@符号", testValue: "user@@game.com", description: "提示：邮箱格式错误" },
+          { class: "中文字符", testValue: "用户@游戏.com", description: "提示：请使用英文邮箱" }
         ]
       }
     ],
+    realCases: [
+      {
+        title: "【真实案例】某MMO游戏角色名重复漏洞",
+        description: "等价类测试发现：含不可见字符（如零宽字符U+200B）的名称被视为不同名称，但显示完全相同，导致玩家混淆和欺诈。",
+        lesson: "等价类需考虑：不可见字符、全角/半角、大小写规范化等隐性等价类。"
+      },
+      {
+        title: "【真实案例】充值系统金额校验绕过",
+        description: "前端限制充值档位，但API未校验。测试人员通过接口发送非标准金额（如0.01元）成功创建订单，获得对应钻石。",
+        lesson: "等价类测试必须同时覆盖前端和后端验证逻辑。"
+      }
+    ],
     checklist: [
-      "识别所有输入参数并确定其有效范围",
-      "为每个参数划分有效和无效等价类",
-      "确保每个等价类至少有一个测试用例覆盖",
-      "组合多参数等价类进行交叉验证",
-      "记录等价类划分依据和测试结果"
+      "识别所有输入参数并确定其有效取值范围",
+      "为每个参数划分有效等价类和无效等价类",
+      "考虑隐性等价类：编码、格式、不可见字符等",
+      "确保每个等价类至少有一个用例覆盖",
+      "无效等价类需单独测试，避免掩盖问题",
+      "记录等价类划分依据，便于维护更新"
     ]
   },
   {
     id: "boundary",
     name: "边界值分析",
     icon: Target,
-    description: "专注于测试输入范围的边界点，包括边界值本身及其临近值",
+    description: "专注于测试输入范围的边界点及其临近值，是发现缺陷率最高的测试技术之一",
     principles: [
-      "最小值 - 1（刚好低于边界）",
-      "最小值（边界值）",
-      "最小值 + 1（刚好高于边界）",
-      "最大值 - 1（刚好低于边界）",
-      "最大值（边界值）",
-      "最大值 + 1（刚好超过边界）"
+      "min - 1：刚好低于最小边界（无效值）",
+      "min：最小边界值（有效值）",
+      "min + 1：刚好高于最小边界（有效值）",
+      "正常值：范围中间的典型值",
+      "max - 1：刚好低于最大边界（有效值）",
+      "max：最大边界值（有效值）",
+      "max + 1：刚好超过最大边界（无效值）"
     ],
     gameExamples: [
       {
-        scenario: "背包容量系统",
+        scenario: "背包容量系统（默认100格，VIP最大200格）",
         boundaries: [
-          { point: "0格", testValues: ["0", "-1", "1"], expected: "0格时显示空背包，-1无效，1格正常显示" },
-          { point: "100格（默认上限）", testValues: ["99", "100", "101"], expected: "99和100正常，101提示背包已满" },
-          { point: "200格（VIP上限）", testValues: ["199", "200", "201"], expected: "VIP用户可达200，超出应提示扩容" }
+          { point: "普通下限", testValues: ["-1", "0", "1"], expected: "-1无效拒绝；0显示空背包；1正常使用" },
+          { point: "普通上限", testValues: ["99", "100", "101"], expected: "99可添加；100提示满；101拒绝并引导扩容" },
+          { point: "VIP上限", testValues: ["199", "200", "201"], expected: "VIP用户：199/200有效；201提示已达上限" }
         ]
       },
       {
-        scenario: "战斗伤害计算",
+        scenario: "战斗伤害数值系统",
         boundaries: [
-          { point: "最小伤害（1点）", testValues: ["0", "1", "2"], expected: "最低保底1点伤害" },
-          { point: "暴击上限（999%）", testValues: ["998%", "999%", "1000%"], expected: "暴击率应封顶999%" },
-          { point: "生命值归零", testValues: ["-1", "0", "1"], expected: "0时死亡，负数应显示为0" }
+          { point: "最小伤害", testValues: ["0", "1", "2"], expected: "保底至少1点伤害，0时显示miss或1" },
+          { point: "暴击倍率上限", testValues: ["299%", "300%", "301%"], expected: "300%封顶，超出截断为300%" },
+          { point: "单次伤害上限", testValues: ["999998", "999999", "1000000"], expected: "999999正常显示，100万截断显示99万+" },
+          { point: "生命值归零", testValues: ["-100", "0", "1"], expected: "负数显示0，0时触发死亡，1时存活" }
         ]
       },
       {
-        scenario: "倒计时系统",
+        scenario: "抽卡保底机制（5星保底90抽）",
         boundaries: [
-          { point: "活动开始（0秒）", testValues: ["-1秒", "0秒", "1秒"], expected: "0秒时活动开启，负数显示已开始" },
-          { point: "活动结束", testValues: ["剩1秒", "0秒", "超时1秒"], expected: "0秒时关闭入口，超时不可进入" }
+          { point: "软保底起点（74抽）", testValues: ["73", "74", "75"], expected: "74抽起概率开始提升" },
+          { point: "硬保底（90抽）", testValues: ["89", "90", "91"], expected: "90抽必出5星，抽数重置" },
+          { point: "大保底（180抽）", testValues: ["179", "180", "181"], expected: "180抽必出UP角色" }
         ]
       },
       {
-        scenario: "抽卡保底机制",
+        scenario: "活动倒计时系统",
         boundaries: [
-          { point: "小保底（80抽）", testValues: ["79抽", "80抽", "81抽"], expected: "80抽必出4星" },
-          { point: "大保底（180抽）", testValues: ["179抽", "180抽", "181抽"], expected: "180抽必出UP角色" }
+          { point: "活动开始", testValues: ["-1秒", "0秒", "1秒"], expected: "-1显示即将开始；0时入口开启；1秒可进入" },
+          { point: "活动结束", testValues: ["剩余1秒", "0秒", "-1秒"], expected: "1秒可操作；0秒关闭入口；负数显示已结束" },
+          { point: "奖励领取截止", testValues: ["截止前1分钟", "截止时刻", "截止后"], expected: "前1分钟可领；截止时刻边界；截止后不可领" }
         ]
       }
     ],
+    realCases: [
+      {
+        title: "【真实案例】抽卡保底重置异常",
+        description: "第90抽必出5星，但当抽数为89时服务器重启，重启后抽数被错误重置为0，玩家损失89抽保底进度。",
+        lesson: "边界值测试需结合异常场景：断网、重启、跨天等边界条件组合。"
+      },
+      {
+        title: "【真实案例】背包满时道具丢失",
+        description: "背包99/100格时领取2个道具，第一个成功，第二个因满仓被丢弃而非发送邮件。",
+        lesson: "边界测试需验证连续操作场景，不仅是单次边界触发。"
+      },
+      {
+        title: "【真实案例】伤害溢出显示为负数",
+        description: "BOSS战中组合伤害超过int32最大值(21亿)，导致伤害显示为负数，结算异常。",
+        lesson: "数值边界需考虑数据类型上限，特别是累计计算场景。"
+      }
+    ],
     checklist: [
-      "识别所有数值型输入的边界范围",
-      "设计边界值测试用例（min-1, min, min+1, max-1, max, max+1）",
-      "验证边界处的业务逻辑正确性",
-      "检查边界值的UI显示是否正确",
-      "测试多参数边界值的组合情况"
+      "识别所有数值型参数的有效边界",
+      "设计标准7点边界值用例（min±1, min, 中间值, max-1, max, max+1）",
+      "验证边界处的业务逻辑和UI显示",
+      "考虑多维边界的组合情况",
+      "测试边界值在异常场景下的表现（断网、重启）",
+      "关注数值累计可能导致的溢出边界"
     ]
   },
   {
     id: "decision-table",
     name: "判定表法",
     icon: Table,
-    description: "通过表格形式分析多条件组合下的不同处理动作",
+    description: "通过表格形式系统化分析多条件组合下的处理动作，确保所有逻辑分支被覆盖",
     principles: [
-      "列出所有条件（输入）和动作（输出）",
-      "计算条件组合数：2^n（n为条件数）",
-      "简化表格：合并相同动作的规则",
-      "确保覆盖所有可能的条件组合"
+      "识别所有条件（输入变量）和动作（输出结果）",
+      "条件组合数 = 2^n（n为布尔条件数）",
+      "简化规则：合并导致相同动作的条件组合",
+      "完备性：确保覆盖所有可能的条件组合",
+      "优先级：当多条件满足时，明确优先处理规则"
     ],
     gameExamples: [
       {
-        scenario: "副本进入条件判断",
-        conditions: ["等级达标", "体力充足", "前置副本完成", "队伍人数满足"],
+        scenario: "副本进入资格判断",
+        conditions: ["等级≥30", "体力≥20", "前置副本已通关", "队伍人数≥3"],
         rules: [
-          { conditions: ["Y", "Y", "Y", "Y"], action: "允许进入副本", priority: "正常" },
-          { conditions: ["N", "-", "-", "-"], action: "提示等级不足", priority: "高" },
-          { conditions: ["Y", "N", "-", "-"], action: "提示体力不足，引导购买", priority: "高" },
-          { conditions: ["Y", "Y", "N", "-"], action: "提示需完成前置副本", priority: "中" },
-          { conditions: ["Y", "Y", "Y", "N"], action: "提示队伍人数不足", priority: "中" }
+          { conditions: ["Y", "Y", "Y", "Y"], action: "允许进入副本，扣除体力", priority: "正常" },
+          { conditions: ["N", "-", "-", "-"], action: "提示：等级不足，需达到30级", priority: "最高" },
+          { conditions: ["Y", "N", "-", "-"], action: "提示：体力不足，引导购买或等待恢复", priority: "高" },
+          { conditions: ["Y", "Y", "N", "-"], action: "提示：请先通关前置副本xxx", priority: "中" },
+          { conditions: ["Y", "Y", "Y", "N"], action: "提示：队伍人数不足，至少需要3人", priority: "低" }
         ]
       },
       {
-        scenario: "装备强化系统",
-        conditions: ["材料足够", "金币足够", "强化等级未满", "保护道具使用"],
+        scenario: "装备强化结果判定",
+        conditions: ["强化石足够", "金币≥消耗", "当前等级<15", "使用保护符"],
         rules: [
-          { conditions: ["Y", "Y", "Y", "Y"], action: "强化成功，失败不降级", priority: "正常" },
-          { conditions: ["Y", "Y", "Y", "N"], action: "强化成功/失败可能降级", priority: "正常" },
-          { conditions: ["N", "-", "-", "-"], action: "提示材料不足", priority: "高" },
-          { conditions: ["Y", "N", "-", "-"], action: "提示金币不足", priority: "高" },
-          { conditions: ["Y", "Y", "N", "-"], action: "提示已达最高等级", priority: "中" }
+          { conditions: ["Y", "Y", "Y", "Y"], action: "强化成功+1级，失败不降级不碎", priority: "正常" },
+          { conditions: ["Y", "Y", "Y", "N"], action: "强化成功+1级，失败降1级（≤10级不降）", priority: "正常" },
+          { conditions: ["Y", "Y", "N", "Y"], action: "提示：已达最高强化等级", priority: "中" },
+          { conditions: ["N", "-", "-", "-"], action: "提示：强化石不足，差X个", priority: "高" },
+          { conditions: ["Y", "N", "-", "-"], action: "提示：金币不足，需要XX金币", priority: "高" }
         ]
       },
       {
-        scenario: "好友添加逻辑",
-        conditions: ["对方存在", "非黑名单", "好友位未满", "对方接受"],
+        scenario: "商品购买校验",
+        conditions: ["货币足够", "背包有空位", "未达购买上限", "活动期间"],
         rules: [
-          { conditions: ["Y", "Y", "Y", "Y"], action: "添加成功", priority: "正常" },
-          { conditions: ["N", "-", "-", "-"], action: "提示用户不存在", priority: "高" },
-          { conditions: ["Y", "N", "-", "-"], action: "提示对方在黑名单中", priority: "高" },
-          { conditions: ["Y", "Y", "N", "-"], action: "提示好友已满", priority: "中" },
-          { conditions: ["Y", "Y", "Y", "N"], action: "等待对方同意/提示被拒绝", priority: "中" }
+          { conditions: ["Y", "Y", "Y", "Y"], action: "购买成功，发放道具，扣除货币", priority: "正常" },
+          { conditions: ["Y", "Y", "Y", "N"], action: "提示：该商品仅活动期间售卖", priority: "高" },
+          { conditions: ["Y", "Y", "N", "-"], action: "提示：已达购买上限（X/X）", priority: "中" },
+          { conditions: ["Y", "N", "-", "-"], action: "提示：背包已满，请整理背包", priority: "中" },
+          { conditions: ["N", "-", "-", "-"], action: "提示：XX币不足，差X个", priority: "高" }
         ]
       }
     ],
+    realCases: [
+      {
+        title: "【真实案例】多条件优先级错误导致误引导",
+        description: "玩家等级不足且体力不足时，系统只提示\"体力不足\"并引导充值，玩家充值后发现还是无法进入（因为等级不够）。",
+        lesson: "判定表需明确条件优先级，优先提示最难满足或最基础的条件。"
+      },
+      {
+        title: "【真实案例】购买校验遗漏组合",
+        description: "VIP用户购买限购商品时，因同时满足\"VIP无限购\"和\"活动期间\"，系统未正确处理VIP+活动的组合逻辑。",
+        lesson: "判定表需穷举所有组合，特别注意\"特权\"条件带来的额外分支。"
+      }
+    ],
     checklist: [
-      "识别所有影响结果的条件变量",
+      "识别影响结果的所有条件变量",
       "列出所有可能的动作/输出结果",
-      "绘制完整的判定表",
+      "绘制完整判定表，计算组合数量",
       "合并冗余规则简化表格",
+      "明确条件优先级处理顺序",
       "为每条规则设计测试用例",
-      "验证条件优先级处理正确"
+      "验证实际优先级与设计一致"
     ]
   },
   {
     id: "cause-effect",
     name: "因果图法",
     icon: GitBranch,
-    description: "分析输入条件（因）与输出结果（果）之间的逻辑关系",
+    description: "分析输入条件（因）与输出结果（果）之间的逻辑关系，适用于复杂业务规则的测试设计",
     principles: [
-      "恒等：若原因出现，则结果出现",
-      "非：若原因出现，则结果不出现",
-      "或：多个原因中任一出现，结果出现",
-      "与：多个原因同时出现，结果才出现"
+      "恒等（Identity）：若原因C出现，则结果E必然出现",
+      "非（NOT）：若原因C出现，则结果E必然不出现",
+      "或（OR）：多个原因中任一出现，结果E就出现",
+      "与（AND）：多个原因必须同时出现，结果E才出现",
+      "约束：互斥（E）、包含（I）、唯一（O）、要求（R）"
     ],
     gameExamples: [
       {
-        scenario: "VIP特权激活",
+        scenario: "VIP等级升级条件",
         causes: [
-          { id: "C1", name: "充值满100元" },
-          { id: "C2", name: "活动期间注册" },
-          { id: "C3", name: "邀请码激活" }
+          { id: "C1", name: "累计充值≥100元" },
+          { id: "C2", name: "累计登录≥30天" },
+          { id: "C3", name: "完成新手任务链" },
+          { id: "C4", name: "购买月卡" }
         ],
         effects: [
           { id: "E1", name: "获得VIP1资格" },
-          { id: "E2", name: "赠送限定礼包" }
+          { id: "E2", name: "获得专属称号" },
+          { id: "E3", name: "解锁VIP专属功能" }
         ],
         relations: [
-          { type: "OR", causes: ["C1", "C2", "C3"], effect: "E1", description: "满足任一条件即可获得VIP1" },
-          { type: "AND", causes: ["C2", "C3"], effect: "E2", description: "活动期间+邀请码才送限定礼包" }
+          { type: "OR", causes: ["C1", "C4"], effect: "E1", description: "充值100元 或 购买月卡 → VIP1" },
+          { type: "AND", causes: ["E1", "C2"], effect: "E2", description: "VIP1 且 登录30天 → 专属称号" },
+          { type: "AND", causes: ["E1", "C3"], effect: "E3", description: "VIP1 且 完成新手任务 → 解锁VIP功能" }
         ]
       },
       {
         scenario: "成就解锁系统",
         causes: [
-          { id: "C1", name: "击败Boss" },
-          { id: "C2", name: "限时内完成" },
-          { id: "C3", name: "无队友阵亡" }
+          { id: "C1", name: "击败最终BOSS" },
+          { id: "C2", name: "10分钟内完成" },
+          { id: "C3", name: "无队友阵亡" },
+          { id: "C4", name: "不使用复活道具" }
         ],
         effects: [
-          { id: "E1", name: "普通成就" },
-          { id: "E2", name: "限时成就" },
-          { id: "E3", name: "完美成就" }
+          { id: "E1", name: "【通关者】成就" },
+          { id: "E2", name: "【速通达人】成就" },
+          { id: "E3", name: "【完美团队】成就" },
+          { id: "E4", name: "【硬核玩家】称号" }
         ],
         relations: [
-          { type: "恒等", causes: ["C1"], effect: "E1", description: "击败Boss获得普通成就" },
-          { type: "AND", causes: ["C1", "C2"], effect: "E2", description: "限时击败获得限时成就" },
-          { type: "AND", causes: ["C1", "C2", "C3"], effect: "E3", description: "完美通关获得完美成就" }
+          { type: "恒等", causes: ["C1"], effect: "E1", description: "击败BOSS → 通关成就" },
+          { type: "AND", causes: ["C1", "C2"], effect: "E2", description: "击败BOSS + 10分钟内 → 速通成就" },
+          { type: "AND", causes: ["C1", "C3"], effect: "E3", description: "击败BOSS + 无阵亡 → 完美团队" },
+          { type: "AND", causes: ["C1", "C2", "C3", "C4"], effect: "E4", description: "全条件达成 → 硬核称号" }
+        ]
+      },
+      {
+        scenario: "邮件奖励发放规则",
+        causes: [
+          { id: "C1", name: "完成每日登录" },
+          { id: "C2", name: "完成每日任务" },
+          { id: "C3", name: "本周首次登录" },
+          { id: "C4", name: "VIP用户" }
+        ],
+        effects: [
+          { id: "E1", name: "发送每日登录奖励" },
+          { id: "E2", name: "发送任务完成奖励" },
+          { id: "E3", name: "发送周登录礼包" },
+          { id: "E4", name: "奖励翻倍" }
+        ],
+        relations: [
+          { type: "恒等", causes: ["C1"], effect: "E1", description: "登录即发每日奖励" },
+          { type: "恒等", causes: ["C2"], effect: "E2", description: "完成任务即发奖励" },
+          { type: "AND", causes: ["C1", "C3"], effect: "E3", description: "登录 + 本周首次 → 周礼包" },
+          { type: "AND", causes: ["C4", "任意奖励"], effect: "E4", description: "VIP用户所有奖励翻倍" }
         ]
       }
     ],
+    realCases: [
+      {
+        title: "【真实案例】成就重复发放",
+        description: "因果关系设计时，未考虑成就的\"一次性\"约束。玩家多次击败BOSS，每次都触发成就奖励发放。",
+        lesson: "因果图需加入约束条件，如：唯一触发、不可重复等状态约束。"
+      },
+      {
+        title: "【真实案例】VIP奖励叠加错误",
+        description: "VIP翻倍逻辑与活动双倍叠加，导致4倍奖励。因果分析时未明确多个\"倍率\"效果的叠加规则。",
+        lesson: "多个增益效果的因果关系需明确：加法叠加、乘法叠加还是取最大值。"
+      }
+    ],
     checklist: [
-      "提取所有输入条件（原因）",
-      "识别所有输出结果（结果）",
-      "分析因果之间的逻辑关系",
-      "绘制因果图并标注约束",
+      "提取所有输入条件（原因）并编号",
+      "识别所有输出结果（结果）并编号",
+      "分析因果之间的逻辑关系（恒等/非/或/与）",
+      "标注约束条件（互斥/包含/唯一）",
+      "绘制因果图并验证完整性",
       "将因果图转化为判定表",
-      "设计覆盖所有因果路径的用例"
+      "设计用例覆盖所有因果路径"
+    ]
+  },
+  {
+    id: "state-transition",
+    name: "状态迁移测试",
+    icon: GitBranch,
+    description: "针对具有状态变化的系统，测试状态之间的转换是否正确",
+    principles: [
+      "识别系统的所有有效状态",
+      "明确状态之间的转换条件（事件/动作）",
+      "验证每个状态转换的正确性",
+      "测试非法状态转换是否被正确拒绝",
+      "关注状态的持久化和恢复"
+    ],
+    gameExamples: [
+      {
+        scenario: "订单状态机",
+        causes: [
+          { id: "S1", name: "待支付" },
+          { id: "S2", name: "支付中" },
+          { id: "S3", name: "支付成功" },
+          { id: "S4", name: "发货中" },
+          { id: "S5", name: "已完成" },
+          { id: "S6", name: "已取消" }
+        ],
+        effects: [
+          { id: "T1", name: "发起支付" },
+          { id: "T2", name: "支付回调成功" },
+          { id: "T3", name: "发货" },
+          { id: "T4", name: "确认收货" },
+          { id: "T5", name: "取消订单" },
+          { id: "T6", name: "超时未支付" }
+        ],
+        relations: [
+          { type: "转换", causes: ["S1"], effect: "S2", description: "待支付 --发起支付--> 支付中" },
+          { type: "转换", causes: ["S2"], effect: "S3", description: "支付中 --支付成功--> 支付成功" },
+          { type: "转换", causes: ["S3"], effect: "S4", description: "支付成功 --发货--> 发货中" },
+          { type: "转换", causes: ["S4"], effect: "S5", description: "发货中 --确认--> 已完成" },
+          { type: "转换", causes: ["S1"], effect: "S6", description: "待支付 --取消/超时--> 已取消" }
+        ]
+      },
+      {
+        scenario: "角色战斗状态",
+        causes: [
+          { id: "S1", name: "空闲状态" },
+          { id: "S2", name: "战斗状态" },
+          { id: "S3", name: "技能释放中" },
+          { id: "S4", name: "被控制状态" },
+          { id: "S5", name: "死亡状态" },
+          { id: "S6", name: "无敌状态" }
+        ],
+        effects: [
+          { id: "T1", name: "进入战斗" },
+          { id: "T2", name: "释放技能" },
+          { id: "T3", name: "被击中" },
+          { id: "T4", name: "HP归零" },
+          { id: "T5", name: "复活" }
+        ],
+        relations: [
+          { type: "转换", causes: ["S1"], effect: "S2", description: "空闲 --受击/攻击--> 战斗" },
+          { type: "转换", causes: ["S2"], effect: "S3", description: "战斗 --释放技能--> 技能释放中" },
+          { type: "转换", causes: ["S2"], effect: "S4", description: "战斗 --被控制--> 控制状态" },
+          { type: "非法", causes: ["S4"], effect: "S3", description: "控制状态下不可释放技能（非法转换）" },
+          { type: "转换", causes: ["任意"], effect: "S5", description: "HP=0 --> 死亡" }
+        ]
+      }
+    ],
+    realCases: [
+      {
+        title: "【真实案例】订单状态跳跃",
+        description: "支付回调延迟，用户取消订单后收到支付成功回调，订单从\"已取消\"变为\"支付成功\"，导致资金异常。",
+        lesson: "状态机需定义终态（已取消、已完成）不可再转换的约束。"
+      }
+    ],
+    checklist: [
+      "绘制完整的状态迁移图",
+      "识别所有有效状态和转换条件",
+      "测试每个合法状态转换",
+      "测试非法状态转换是否被拒绝",
+      "验证状态持久化和异常恢复",
+      "测试并发操作对状态的影响"
     ]
   }
 ];
