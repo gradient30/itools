@@ -60,6 +60,7 @@ import AsciiReference from "./pages/docs/AsciiReference";
 import ColorsReference from "./pages/docs/ColorsReference";
 import PortsReference from "./pages/docs/PortsReference";
 import SecurityTestingReference from "./pages/docs/SecurityTestingReference";
+import GameTestingReference from "./pages/docs/GameTestingReference";
 
 const queryClient = new QueryClient();
 
@@ -128,6 +129,7 @@ const App = () => (
             <Route path="/docs/colors" element={<ColorsReference />} />
             <Route path="/docs/ports" element={<PortsReference />} />
             <Route path="/docs/security-testing" element={<SecurityTestingReference />} />
+            <Route path="/docs/game-testing" element={<GameTestingReference />} />
             
             <Route path="*" element={<NotFound />} />
           </Routes>

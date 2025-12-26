@@ -34,6 +34,7 @@ import {
   GitBranch,
   Globe,
   Shield,
+  Gamepad2,
 } from "lucide-react";
 
 export interface Tool {
@@ -331,6 +332,12 @@ export const toolCategories: ToolCategory[] = [
         description: "OWASP Top 10与渗透测试速查",
         icon: Shield,
         path: "/docs/security-testing",
+      },
+      {
+        name: "游戏测试技术",
+        description: "游戏行业黑盒测试与质量验收指南",
+        icon: Gamepad2,
+        path: "/docs/game-testing",
       },
     ],
   },
