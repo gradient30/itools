@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, type MouseEvent } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Layers, Zap, Shield, Sparkles, Megaphone, Calendar, User, FileText, Mail, MessageCircle } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
@@ -17,6 +17,11 @@ import { Separator } from "@/components/ui/separator";
 // 公告版本号 - 每次有新公告时更新此值
 const ANNOUNCEMENT_VERSION = "2025-01-01-v1";
 
+const QQ_UIN = "349487325";
+const QQ_SCHEME_DESKTOP = `tencent://message/?uin=${QQ_UIN}`;
+const QQ_SCHEME_MOBILE = `mqqwpa://im/chat?chat_type=wpa&uin=${QQ_UIN}&version=1&src_type=web&web_src=toolbox`;
+const QQ_WEB_FALLBACK = `https://wpa.qq.com/msgrd?v=3&uin=${QQ_UIN}&site=qq&menu=yes`;
+
 const AnnouncementDialog = () => {
   const [isRead, setIsRead] = useState(() => {
     return localStorage.getItem("announcement_read") === ANNOUNCEMENT_VERSION;
@@ -27,6 +32,43 @@ const AnnouncementDialog = () => {
       localStorage.setItem("announcement_read", ANNOUNCEMENT_VERSION);
       setIsRead(true);
     }
+  };
+
+  const handleQQClick = (e: MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+
+    const ua = navigator.userAgent;
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(ua);
+    const scheme = isMobile ? QQ_SCHEME_MOBILE : QQ_SCHEME_DESKTOP;
+
+    let didLeave = false;
+    const markLeave = () => {
+      didLeave = true;
+    };
+
+    const onVisibilityChange = () => {
+      if (document.hidden) markLeave();
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    window.addEventListener("blur", markLeave, { once: true });
+
+    // 尝试拉起 QQ（浏览器对自定义协议支持不一致，这里做 best-effort）
+    const iframe = document.createElement("iframe");
+    iframe.style.display = "none";
+    iframe.src = scheme;
+    document.body.appendChild(iframe);
+
+    window.setTimeout(() => {
+      if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+    }, 800);
+
+    // 若未成功拉起（页面未进入后台/未失焦），则跳转到 Web 兜底
+    window.setTimeout(() => {
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      if (!didLeave) {
+        window.location.href = QQ_WEB_FALLBACK;
+      }
+    }, 1100);
   };
 
   const currentDate = new Date().toLocaleDateString('zh-CN', {
@@ -41,8 +83,9 @@ const AnnouncementDialog = () => {
         <button 
           className="relative p-1 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors ring-2 ring-primary/30 hover:ring-primary/50"
           title="系统公告"
+          aria-label="系统公告"
         >
-          <Megaphone className="h-5 w-5 text-primary" />
+          <Megaphone className={`h-5 w-5 text-primary ${!isRead ? "motion-safe:animate-bounce" : ""}`} />
           {!isRead && (
             <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-destructive animate-pulse ring-2 ring-background" />
           )}
@@ -96,7 +139,9 @@ const AnnouncementDialog = () => {
           {/* 联系方式 */}
           <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
             <a 
-              href="tencent://message/?uin=349487325"
+              href={QQ_SCHEME_DESKTOP}
+              onClick={handleQQClick}
+              aria-label="联系QQ"
               className="flex items-center gap-1.5 text-muted-foreground hover:text-primary transition-colors"
             >
               <MessageCircle className="h-4 w-4" />
