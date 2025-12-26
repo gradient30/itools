@@ -34,7 +34,25 @@ import {
   Coins,
   Gift,
   Trophy,
-  Star
+  Star,
+  Wifi,
+  WifiOff,
+  Lock,
+  CreditCard,
+  Key,
+  Bug,
+  RefreshCw,
+  Timer,
+  Database,
+  Eye,
+  EyeOff,
+  ShieldCheck,
+  ShieldAlert,
+  Banknote,
+  Receipt,
+  AlertCircle,
+  XCircle,
+  Activity
 } from "lucide-react";
 import { useState } from "react";
 
@@ -862,6 +880,434 @@ const gameModuleTests = [
   }
 ];
 
+// 专项测试 - 弱网测试
+const weakNetworkTesting = {
+  description: "针对移动网络不稳定场景的专项测试，确保游戏在弱网环境下的用户体验和数据安全",
+  networkConditions: [
+    {
+      type: "2G网络 (GPRS/EDGE)",
+      latency: "300-1000ms",
+      bandwidth: "50-250 Kbps",
+      packetLoss: "5-10%",
+      scenarios: ["登录流程", "基础功能操作", "文本类消息"],
+      expectedBehavior: "可使用基础功能，大量资源加载需进度提示"
+    },
+    {
+      type: "3G网络 (HSPA)",
+      latency: "100-500ms",
+      bandwidth: "1-5 Mbps",
+      packetLoss: "1-5%",
+      scenarios: ["战斗操作", "即时通讯", "小额充值"],
+      expectedBehavior: "核心功能可用，可能有轻微延迟感"
+    },
+    {
+      type: "弱4G/信号边缘",
+      latency: "50-200ms",
+      bandwidth: "5-10 Mbps",
+      packetLoss: "0.5-2%",
+      scenarios: ["多人实时对战", "资源下载", "直播功能"],
+      expectedBehavior: "大部分功能正常，偶发卡顿可接受"
+    },
+    {
+      type: "网络抖动",
+      latency: "波动大于100ms",
+      bandwidth: "不稳定",
+      packetLoss: "随机丢包",
+      scenarios: ["竞技对战", "交易操作", "实时语音"],
+      expectedBehavior: "需有重连机制和状态恢复"
+    },
+    {
+      type: "网络切换",
+      latency: "切换时延",
+      bandwidth: "变化",
+      packetLoss: "切换时可能中断",
+      scenarios: ["WiFi↔4G切换", "跨基站切换", "地铁/电梯场景"],
+      expectedBehavior: "无感知切换，或友好断线重连提示"
+    }
+  ],
+  testScenarios: [
+    {
+      category: "登录认证",
+      icon: Users,
+      cases: [
+        { scenario: "弱网登录", steps: "限速100Kbps环境下登录游戏", expected: "登录超时提示友好，支持重试，不出现ANR", priority: "P0" },
+        { scenario: "登录中断网", steps: "登录过程中切换飞行模式", expected: "请求终止，提示网络异常，可重试", priority: "P0" },
+        { scenario: "token续期弱网", steps: "token即将过期时限速1Mbps", expected: "续期成功或提示重新登录，不闪退", priority: "P1" },
+        { scenario: "多点登录弱网", steps: "A设备弱网时B设备登录", expected: "A设备收到踢出通知（可延迟），状态正确", priority: "P1" }
+      ]
+    },
+    {
+      category: "战斗系统",
+      icon: Swords,
+      cases: [
+        { scenario: "战斗中高延迟", steps: "PVE战斗中模拟500ms延迟", expected: "操作响应延迟但流畅，伤害计算服务端为准", priority: "P0" },
+        { scenario: "战斗中断网", steps: "BOSS战关键时刻断网3秒", expected: "断线重连后战斗状态恢复，不丢失进度", priority: "P0" },
+        { scenario: "PVP高丢包", steps: "实时对战中模拟10%丢包", expected: "有位置补偿，操作可能延迟但不乱序", priority: "P0" },
+        { scenario: "技能释放弱网", steps: "释放技能时网络延迟500ms", expected: "技能正常释放，不出现双重消耗或无效果", priority: "P1" },
+        { scenario: "战斗结算断网", steps: "胜利结算时断网", expected: "本地缓存结果，恢复后同步，奖励不丢失", priority: "P0" }
+      ]
+    },
+    {
+      category: "充值交易",
+      icon: CreditCard,
+      cases: [
+        { scenario: "支付过程断网", steps: "点击支付后立即断网", expected: "订单创建失败提示，不扣款不发货", priority: "P0" },
+        { scenario: "支付回调延迟", steps: "模拟支付成功但回调延迟60秒", expected: "轮询确认机制，最终正确到账", priority: "P0" },
+        { scenario: "弱网购买道具", steps: "200Kbps环境购买道具", expected: "购买成功或失败明确提示，不重复购买", priority: "P0" },
+        { scenario: "连续购买弱网", steps: "弱网快速点击购买3次", expected: "防重机制生效，只成功1次", priority: "P0" }
+      ]
+    },
+    {
+      category: "数据同步",
+      icon: RefreshCw,
+      cases: [
+        { scenario: "背包数据弱网同步", steps: "弱网获取大量道具", expected: "分批同步，有进度展示，最终数据一致", priority: "P1" },
+        { scenario: "离线数据合并", steps: "离线完成任务后恢复网络", expected: "数据正确合并，无冲突", priority: "P1" },
+        { scenario: "排行榜弱网加载", steps: "500Kbps加载500人排行榜", expected: "分页加载，有骨架屏，不阻塞操作", priority: "P2" },
+        { scenario: "邮件弱网领取", steps: "弱网批量领取100封邮件", expected: "逐条领取，失败可重试，不丢附件", priority: "P1" }
+      ]
+    }
+  ],
+  testTools: [
+    { name: "Charles Proxy", usage: "设置Throttle模拟弱网，支持自定义带宽/延迟/丢包", platform: "iOS/Android/PC" },
+    { name: "Network Link Conditioner", usage: "Apple官方弱网工具，预设多种网络环境", platform: "iOS/Mac" },
+    { name: "ATC (Augmented Traffic Control)", usage: "Facebook开源，支持大规模弱网模拟", platform: "Android/Linux" },
+    { name: "Fiddler", usage: "可模拟延迟和限速，适合接口级测试", platform: "Windows" },
+    { name: "clumsy", usage: "Windows下模拟丢包、延迟、乱序", platform: "Windows" },
+    { name: "Android Emulator", usage: "内置网络限速功能", platform: "Android" }
+  ],
+  checklist: [
+    "所有P0场景在2G环境下验证通过",
+    "核心交易流程有超时和重试机制",
+    "断线重连机制验证（5秒/10秒/30秒断线）",
+    "数据一致性校验（弱网操作后强网校验）",
+    "客户端不因网络问题闪退或ANR",
+    "友好的网络异常提示，非技术术语",
+    "关键操作有本地缓存和恢复机制",
+    "支付等敏感操作有防重复提交保护"
+  ]
+};
+
+// 专项测试 - 安全测试
+const securityTesting = {
+  description: "游戏安全测试覆盖客户端安全、通信安全、服务端安全、业务逻辑安全等多个层面",
+  categories: [
+    {
+      name: "客户端安全",
+      icon: Smartphone,
+      tests: [
+        {
+          item: "反编译防护",
+          description: "检查APK/IPA是否可被轻易反编译获取源码",
+          testMethod: "使用jadx/IDA Pro/Hopper反编译，检查代码混淆程度",
+          riskLevel: "P0",
+          realCase: "某游戏APK未加固，被反编译后修改充值金额参数，绕过支付"
+        },
+        {
+          item: "内存数据保护",
+          description: "检查内存中敏感数据（金币、生命值等）是否加密",
+          testMethod: "使用GameGuardian/Cheat Engine搜索并修改内存数值",
+          riskLevel: "P0",
+          realCase: "MMORPG游戏内存中金币明文存储，修改后服务端未校验导致刷钱"
+        },
+        {
+          item: "本地存档安全",
+          description: "检查本地存储的游戏数据是否加密",
+          testMethod: "查看SharedPreferences/SQLite/PlayerPrefs文件，尝试篡改",
+          riskLevel: "P1",
+          realCase: "单机游戏存档未加密，修改关卡解锁状态绕过付费"
+        },
+        {
+          item: "二次打包检测",
+          description: "检查是否能重新签名后运行",
+          testMethod: "修改APK后重新签名安装，检查是否有签名校验",
+          riskLevel: "P0",
+          realCase: "游戏被重打包植入广告SDK，损害玩家利益"
+        },
+        {
+          item: "调试器检测",
+          description: "检查是否允许动态调试",
+          testMethod: "使用Frida/Xposed hook关键函数，检查是否有反调试",
+          riskLevel: "P1",
+          realCase: "通过动态调试绕过游戏内购验证"
+        },
+        {
+          item: "Root/越狱检测",
+          description: "检查设备root/越狱状态检测机制",
+          testMethod: "在root设备上运行，检查是否有检测和限制",
+          riskLevel: "P2",
+          realCase: "root设备可运行各类作弊工具"
+        }
+      ]
+    },
+    {
+      name: "通信安全",
+      icon: Wifi,
+      tests: [
+        {
+          item: "协议加密",
+          description: "检查客户端与服务端通信是否加密",
+          testMethod: "抓包分析请求/响应数据，检查是否为明文",
+          riskLevel: "P0",
+          realCase: "游戏协议明文传输，中间人攻击可窃取账号"
+        },
+        {
+          item: "证书校验",
+          description: "检查HTTPS证书验证是否严格",
+          testMethod: "使用自签名证书代理，检查是否信任",
+          riskLevel: "P0",
+          realCase: "未做证书绑定，公共WiFi下可中间人攻击"
+        },
+        {
+          item: "协议重放防护",
+          description: "检查请求是否可被重放攻击",
+          testMethod: "抓取正常请求，多次重放观察是否生效",
+          riskLevel: "P0",
+          realCase: "道具购买请求可重放，一次付费多次获得道具"
+        },
+        {
+          item: "协议篡改防护",
+          description: "检查请求参数是否可被篡改",
+          testMethod: "修改请求中的金额/数量参数，检查服务端校验",
+          riskLevel: "P0",
+          realCase: "修改购买数量参数为负数，反向获得金币"
+        },
+        {
+          item: "时间戳校验",
+          description: "检查请求时效性验证",
+          testMethod: "修改请求时间戳或延迟发送过期请求",
+          riskLevel: "P1",
+          realCase: "无时间校验，录制的请求可无限重放"
+        },
+        {
+          item: "敏感数据传输",
+          description: "检查敏感信息（密码、token）传输安全",
+          testMethod: "抓包查看登录、支付等敏感接口数据",
+          riskLevel: "P0",
+          realCase: "密码MD5传输未加盐，彩虹表可破解"
+        }
+      ]
+    },
+    {
+      name: "服务端安全",
+      icon: Database,
+      tests: [
+        {
+          item: "接口鉴权",
+          description: "检查API是否有权限验证",
+          testMethod: "无token或错误token调用接口，检查返回",
+          riskLevel: "P0",
+          realCase: "管理后台接口无鉴权，可直接调用发放道具"
+        },
+        {
+          item: "越权访问",
+          description: "检查是否可访问他人数据",
+          testMethod: "修改用户ID参数访问其他玩家数据",
+          riskLevel: "P0",
+          realCase: "修改player_id可查看/修改他人背包数据"
+        },
+        {
+          item: "SQL注入",
+          description: "检查输入参数SQL注入风险",
+          testMethod: "在输入框注入SQL语句，观察报错或异常行为",
+          riskLevel: "P0",
+          realCase: "角色名包含SQL语句导致删库事故"
+        },
+        {
+          item: "数值校验",
+          description: "检查服务端数值边界校验",
+          testMethod: "发送超大/负数/浮点数参数，检查处理",
+          riskLevel: "P0",
+          realCase: "购买数量传入-1，金币反加不扣道具"
+        },
+        {
+          item: "并发安全",
+          description: "检查并发请求的处理",
+          testMethod: "同一操作并发请求10次，检查结果一致性",
+          riskLevel: "P0",
+          realCase: "奖励领取接口并发调用，领取10次奖励"
+        },
+        {
+          item: "日志安全",
+          description: "检查日志是否泄露敏感信息",
+          testMethod: "查看服务端日志是否包含密码、token等",
+          riskLevel: "P1",
+          realCase: "错误日志打印完整支付请求含用户隐私"
+        }
+      ]
+    },
+    {
+      name: "业务逻辑安全",
+      icon: ShieldCheck,
+      tests: [
+        {
+          item: "道具复制漏洞",
+          description: "检查是否可通过操作复制道具",
+          testMethod: "交易/邮寄过程中异常操作，检查道具数量",
+          riskLevel: "P0",
+          realCase: "交易时双方同时取消，道具同时存在于两人背包"
+        },
+        {
+          item: "货币生成漏洞",
+          description: "检查是否可非法生成游戏货币",
+          testMethod: "检查所有货币获取途径的校验逻辑",
+          riskLevel: "P0",
+          realCase: "活动奖励发放与活动条件检查不同步，重复领取"
+        },
+        {
+          item: "抽卡概率验证",
+          description: "验证抽卡实际概率与公示一致",
+          testMethod: "大量抽卡统计实际概率，与公示对比",
+          riskLevel: "P1",
+          realCase: "实际5星概率0.3%，公示0.6%，涉嫌欺诈"
+        },
+        {
+          item: "活动时间绕过",
+          description: "检查是否可绕过活动时间限制",
+          testMethod: "修改设备时间或时区，尝试参与未开始/已结束活动",
+          riskLevel: "P1",
+          realCase: "修改时区提前进入限时活动领取奖励"
+        },
+        {
+          item: "排行榜作弊",
+          description: "检查排行榜分数是否可伪造",
+          testMethod: "检查分数上报接口的校验机制",
+          riskLevel: "P1",
+          realCase: "直接调用接口上报超高分数，占据榜首"
+        },
+        {
+          item: "邀请奖励滥用",
+          description: "检查邀请系统的防刷机制",
+          testMethod: "自己邀请自己、使用模拟器批量注册",
+          riskLevel: "P1",
+          realCase: "批量注册小号完成邀请任务刷奖励"
+        }
+      ]
+    }
+  ],
+  penetrationTestFlow: [
+    { step: 1, name: "信息收集", tasks: ["确定测试范围", "收集APK/IPA", "抓包分析协议", "识别技术栈"] },
+    { step: 2, name: "客户端分析", tasks: ["反编译分析", "本地存储检查", "加固识别", "hook点定位"] },
+    { step: 3, name: "协议分析", tasks: ["加密方式识别", "签名算法分析", "关键接口梳理", "参数含义推断"] },
+    { step: 4, name: "漏洞挖掘", tasks: ["协议篡改测试", "重放攻击测试", "并发测试", "逻辑漏洞测试"] },
+    { step: 5, name: "漏洞验证", tasks: ["构造POC", "影响评估", "复现记录", "修复建议"] },
+    { step: 6, name: "报告输出", tasks: ["漏洞详情", "风险等级", "修复方案", "验证方法"] }
+  ],
+  commonTools: [
+    { category: "抓包工具", tools: ["Charles", "Fiddler", "Wireshark", "mitmproxy"] },
+    { category: "反编译工具", tools: ["jadx", "IDA Pro", "Hopper", "JEB"] },
+    { category: "动态调试", tools: ["Frida", "Xposed", "Objection", "Cycript"] },
+    { category: "内存修改", tools: ["GameGuardian", "Cheat Engine", "iGameGuardian"] },
+    { category: "自动化工具", tools: ["Burp Suite", "SQLMap", "OWASP ZAP"] }
+  ]
+};
+
+// 专项测试 - 支付测试
+const paymentTesting = {
+  description: "游戏支付测试是资金安全的核心保障，覆盖支付流程、异常处理、对账核验等关键环节",
+  paymentChannels: [
+    { channel: "Apple IAP", features: ["苹果内购", "自动续订", "恢复购买"], notes: "沙盒测试账号，注意30%分成" },
+    { channel: "Google Play", features: ["Google Pay", "订阅", "促销代码"], notes: "测试信用卡，测试环境可真实支付" },
+    { channel: "微信支付", features: ["APP支付", "H5支付", "小程序支付"], notes: "沙盒环境1分钱测试" },
+    { channel: "支付宝", features: ["APP支付", "H5支付", "花呗"], notes: "沙盒账号测试" },
+    { channel: "渠道支付", features: ["华为支付", "OPPO支付", "小米支付"], notes: "各渠道SDK单独对接测试" },
+    { channel: "第三方聚合", features: ["Ping++", "易宝", "PayPal"], notes: "统一接入多渠道" }
+  ],
+  testScenarios: [
+    {
+      category: "正常支付流程",
+      icon: CheckCircle2,
+      cases: [
+        { id: "PAY-001", scenario: "首次充值", steps: "新用户首次购买6元档位", expected: "支付成功，道具到账，首充奖励触发", priority: "P0" },
+        { id: "PAY-002", scenario: "常规充值", steps: "已购用户购买30元档位", expected: "支付成功，道具数量正确", priority: "P0" },
+        { id: "PAY-003", scenario: "最大额充值", steps: "购买648元档位", expected: "支付成功，赠送道具正确计算", priority: "P0" },
+        { id: "PAY-004", scenario: "连续充值", steps: "30秒内购买3次不同档位", expected: "3笔订单独立处理，均正确到账", priority: "P0" },
+        { id: "PAY-005", scenario: "月卡购买", steps: "购买30元月卡", expected: "立即到账首日钻石，后续每日可领", priority: "P0" },
+        { id: "PAY-006", scenario: "订阅续费", steps: "自动续订周卡/月卡", expected: "到期自动扣款，权益延续", priority: "P1" }
+      ]
+    },
+    {
+      category: "支付异常处理",
+      icon: AlertCircle,
+      cases: [
+        { id: "PAY-101", scenario: "支付取消", steps: "唤起支付后点击取消", expected: "订单关闭，可重新发起", priority: "P0" },
+        { id: "PAY-102", scenario: "支付超时", steps: "唤起支付后等待超时（通常15分钟）", expected: "订单关闭，提示支付超时", priority: "P1" },
+        { id: "PAY-103", scenario: "余额不足", steps: "账户余额不足时支付", expected: "支付渠道提示余额不足", priority: "P1" },
+        { id: "PAY-104", scenario: "支付密码错误", steps: "故意输入错误支付密码", expected: "支付失败，订单可重试", priority: "P1" },
+        { id: "PAY-105", scenario: "网络中断", steps: "点击支付后立即断网", expected: "支付失败或待确认，不重复扣款", priority: "P0" },
+        { id: "PAY-106", scenario: "支付中杀进程", steps: "支付页面强制关闭APP", expected: "回来后订单状态正确，已付款则补发", priority: "P0" },
+        { id: "PAY-107", scenario: "重复点击支付", steps: "快速多次点击支付按钮", expected: "只生成一笔订单，防重机制生效", priority: "P0" }
+      ]
+    },
+    {
+      category: "掉单补发",
+      icon: RefreshCw,
+      cases: [
+        { id: "PAY-201", scenario: "回调延迟", steps: "支付成功但回调延迟5分钟", expected: "轮询机制补发，最终到账", priority: "P0" },
+        { id: "PAY-202", scenario: "回调失败重试", steps: "模拟回调接口返回失败", expected: "支付渠道重试，最终成功", priority: "P0" },
+        { id: "PAY-203", scenario: "手动补发", steps: "确认支付成功但未到账，触发补发", expected: "客服后台可查询并补发", priority: "P0" },
+        { id: "PAY-204", scenario: "重复回调", steps: "同一订单回调推送2次", expected: "幂等处理，只发一次货", priority: "P0" },
+        { id: "PAY-205", scenario: "订单状态查询", steps: "主动查询订单状态", expected: "返回准确的支付状态", priority: "P1" }
+      ]
+    },
+    {
+      category: "退款处理",
+      icon: Banknote,
+      cases: [
+        { id: "PAY-301", scenario: "苹果退款", steps: "通过Apple申请退款", expected: "收到退款通知，扣除对应道具或负值", priority: "P0" },
+        { id: "PAY-302", scenario: "Google退款", steps: "通过Google Play退款", expected: "Voided Purchase回调处理", priority: "P0" },
+        { id: "PAY-303", scenario: "恶意退款", steps: "购买后使用道具再退款", expected: "道具余额变负或封号处理", priority: "P0" },
+        { id: "PAY-304", scenario: "订阅取消", steps: "取消自动续订", expected: "当前周期结束后不再扣款", priority: "P1" },
+        { id: "PAY-305", scenario: "恢复购买", steps: "iOS恢复购买功能", expected: "正确恢复已购非消耗品", priority: "P1" }
+      ]
+    },
+    {
+      category: "安全验证",
+      icon: Shield,
+      cases: [
+        { id: "PAY-401", scenario: "伪造支付回调", steps: "构造虚假支付成功回调", expected: "签名验证失败，拒绝处理", priority: "P0" },
+        { id: "PAY-402", scenario: "篡改金额", steps: "修改订单金额为1分", expected: "金额校验失败，拒绝发货", priority: "P0" },
+        { id: "PAY-403", scenario: "订单号伪造", steps: "使用已完成的订单号重复请求", expected: "订单已处理，不重复发货", priority: "P0" },
+        { id: "PAY-404", scenario: "越权购买", steps: "修改user_id参数购买", expected: "权限校验，只能为自己购买", priority: "P0" },
+        { id: "PAY-405", scenario: "沙盒环境穿透", steps: "沙盒订单提交到生产环境", expected: "环境校验，沙盒订单不发货", priority: "P0" }
+      ]
+    },
+    {
+      category: "对账核验",
+      icon: Receipt,
+      cases: [
+        { id: "PAY-501", scenario: "日对账", steps: "每日核对订单与发货记录", expected: "订单金额、数量与渠道一致", priority: "P0" },
+        { id: "PAY-502", scenario: "差异订单", steps: "发现对账差异订单", expected: "有差异告警和处理流程", priority: "P0" },
+        { id: "PAY-503", scenario: "渠道账单核对", steps: "与支付渠道账单核对", expected: "金额、手续费、结算额正确", priority: "P1" },
+        { id: "PAY-504", scenario: "退款对账", steps: "核对退款订单和道具回收", expected: "退款订单有对应的扣除记录", priority: "P1" }
+      ]
+    }
+  ],
+  keyCheckpoints: [
+    { checkpoint: "订单创建", validations: ["用户身份校验", "商品有效性", "价格一致性", "库存检查", "购买限制"], risk: "订单伪造、价格篡改" },
+    { checkpoint: "支付唤起", validations: ["金额传递正确", "订单号唯一", "签名正确", "超时设置"], risk: "金额不一致、重复订单" },
+    { checkpoint: "支付完成", validations: ["回调签名验证", "订单状态检查", "金额比对", "幂等处理"], risk: "伪造回调、重复发货" },
+    { checkpoint: "道具发放", validations: ["用户正确", "道具正确", "数量正确", "发放记录"], risk: "发错人、发错物、发错量" },
+    { checkpoint: "数据记录", validations: ["支付流水", "道具日志", "用户余额", "统计数据"], risk: "数据丢失、统计不准" }
+  ],
+  sandboxTestGuide: [
+    { platform: "Apple", steps: ["创建沙盒测试账号", "设备登录沙盒账号", "App内购买使用沙盒账号", "沙盒账号免真实扣款"], notes: "沙盒环境速度较慢，订阅测试时间压缩" },
+    { platform: "Google", steps: ["添加测试账号到Play Console", "上传APK到内部测试", "使用测试账号购买", "测试卡支付"], notes: "许可测试可测试完整流程" },
+    { platform: "微信支付", steps: ["开通沙盒环境", "获取沙盒密钥", "调用沙盒接口", "固定金额测试"], notes: "仿真系统模拟支付" },
+    { platform: "支付宝", steps: ["下载沙盒支付宝", "配置沙盒账号", "使用沙盒环境调用", "沙盒账号登录"], notes: "沙盒APP与正式版独立" }
+  ],
+  riskReminders: [
+    "严禁使用真实资金测试，所有测试必须在沙盒环境进行",
+    "测试账号与正式账号严格隔离",
+    "支付日志保留完整，便于问题追溯",
+    "回调接口必须验证签名，防止伪造",
+    "订单处理必须保证幂等性，防止重复发货",
+    "关键支付逻辑服务端校验，不信任客户端",
+    "异常订单有告警机制，及时人工介入",
+    "定期对账，发现差异立即处理"
+  ]
+};
+
 const GameTestingReference = () => {
   const [expandedTechnique, setExpandedTechnique] = useState<string | null>(null);
   const [expandedCharter, setExpandedCharter] = useState<string | null>(null);
@@ -891,10 +1337,11 @@ const GameTestingReference = () => {
       </Card>
 
       <Tabs defaultValue="blackbox" className="w-full">
-        <TabsList className="grid grid-cols-2 md:grid-cols-5 w-full h-auto gap-1 bg-muted/50 p-1">
+        <TabsList className="grid grid-cols-2 md:grid-cols-6 w-full h-auto gap-1 bg-muted/50 p-1">
           <TabsTrigger value="blackbox" className="text-xs md:text-sm">黑盒测试技术</TabsTrigger>
           <TabsTrigger value="exploratory" className="text-xs md:text-sm">探索式测试</TabsTrigger>
           <TabsTrigger value="risk" className="text-xs md:text-sm">风险测试</TabsTrigger>
+          <TabsTrigger value="specialized" className="text-xs md:text-sm">专项测试</TabsTrigger>
           <TabsTrigger value="acceptance" className="text-xs md:text-sm">验收标准</TabsTrigger>
           <TabsTrigger value="modules" className="text-xs md:text-sm">模块测试</TabsTrigger>
         </TabsList>
@@ -1381,6 +1828,378 @@ const GameTestingReference = () => {
                       </div>
                     </CardContent>
                   </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* 专项测试 */}
+        <TabsContent value="specialized" className="space-y-6">
+          {/* 弱网测试 */}
+          <Card className="border-primary/20">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <WifiOff className="h-5 w-5 text-primary" />
+                弱网测试专项方案
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">{weakNetworkTesting.description}</p>
+            </CardHeader>
+          </Card>
+
+          {/* 网络条件说明 */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Activity className="h-4 w-4 text-primary" />
+                网络环境模拟参数
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-3">
+                {weakNetworkTesting.networkConditions.map((condition, idx) => (
+                  <div key={idx} className="p-3 rounded-lg bg-muted/30 border">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-medium text-sm">{condition.type}</span>
+                      <div className="flex gap-2">
+                        <Badge variant="outline" className="text-xs">延迟: {condition.latency}</Badge>
+                        <Badge variant="outline" className="text-xs">带宽: {condition.bandwidth}</Badge>
+                        <Badge variant="secondary" className="text-xs">丢包: {condition.packetLoss}</Badge>
+                      </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground">{condition.expectedBehavior}</p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* 弱网测试场景 */}
+          <div className="grid gap-4">
+            {weakNetworkTesting.testScenarios.map((category) => (
+              <Card key={category.category}>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <category.icon className="h-4 w-4 text-primary" />
+                    {category.category}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ScrollArea className="w-full">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="p-2 text-left font-medium">场景</th>
+                          <th className="p-2 text-left font-medium">测试步骤</th>
+                          <th className="p-2 text-left font-medium">预期结果</th>
+                          <th className="p-2 text-left font-medium">优先级</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {category.cases.map((testCase, idx) => (
+                          <tr key={idx} className="border-b last:border-0">
+                            <td className="p-2 font-medium">{testCase.scenario}</td>
+                            <td className="p-2 text-muted-foreground">{testCase.steps}</td>
+                            <td className="p-2 text-muted-foreground">{testCase.expected}</td>
+                            <td className="p-2">
+                              <Badge variant={testCase.priority === "P0" ? "destructive" : testCase.priority === "P1" ? "default" : "secondary"}>
+                                {testCase.priority}
+                              </Badge>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </ScrollArea>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* 弱网测试工具 */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">弱网模拟工具</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+                {weakNetworkTesting.testTools.map((tool, idx) => (
+                  <div key={idx} className="p-3 rounded-lg bg-muted/30 border">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-medium text-sm">{tool.name}</span>
+                      <Badge variant="outline" className="text-xs">{tool.platform}</Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground">{tool.usage}</p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* 弱网测试检查清单 */}
+          <Card className="bg-muted/30">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-green-500" />
+                弱网测试检查清单
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid md:grid-cols-2 gap-2">
+                {weakNetworkTesting.checklist.map((item, idx) => (
+                  <label key={idx} className="flex items-center gap-2 text-sm cursor-pointer">
+                    <input type="checkbox" className="rounded" />
+                    <span className="text-muted-foreground">{item}</span>
+                  </label>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* 安全测试 */}
+          <Card className="border-destructive/20 mt-8">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Shield className="h-5 w-5 text-destructive" />
+                安全测试专项方案
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">{securityTesting.description}</p>
+            </CardHeader>
+          </Card>
+
+          {/* 安全测试分类 */}
+          {securityTesting.categories.map((category) => (
+            <Card key={category.name}>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <category.icon className="h-4 w-4 text-primary" />
+                  {category.name}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {category.tests.map((test, idx) => (
+                    <div key={idx} className="p-3 rounded-lg bg-muted/30 border">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-sm">{test.item}</span>
+                        <Badge variant={test.riskLevel === "P0" ? "destructive" : test.riskLevel === "P1" ? "default" : "secondary"}>
+                          {test.riskLevel}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-2">{test.description}</p>
+                      <div className="grid gap-2 text-xs">
+                        <div className="flex items-start gap-2">
+                          <Badge variant="outline" className="shrink-0">测试方法</Badge>
+                          <span className="text-muted-foreground">{test.testMethod}</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <Badge variant="secondary" className="shrink-0">真实案例</Badge>
+                          <span className="text-destructive/80">{test.realCase}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+
+          {/* 渗透测试流程 */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Bug className="h-4 w-4 text-primary" />
+                渗透测试流程
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid md:grid-cols-3 lg:grid-cols-6 gap-3">
+                {securityTesting.penetrationTestFlow.map((phase, idx) => (
+                  <div key={idx} className="p-3 rounded-lg bg-muted/30 border text-center">
+                    <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center mx-auto mb-2 text-sm font-bold">
+                      {phase.step}
+                    </div>
+                    <div className="font-medium text-sm mb-2">{phase.name}</div>
+                    <ul className="text-xs text-muted-foreground space-y-1">
+                      {phase.tasks.map((task, i) => (
+                        <li key={i}>• {task}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* 安全测试工具 */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">安全测试工具集</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-3">
+                {securityTesting.commonTools.map((group, idx) => (
+                  <div key={idx} className="p-3 rounded-lg bg-muted/30 border">
+                    <div className="font-medium text-sm mb-2">{group.category}</div>
+                    <div className="flex flex-wrap gap-1">
+                      {group.tools.map((tool, i) => (
+                        <Badge key={i} variant="outline" className="text-xs">{tool}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* 支付测试 */}
+          <Card className="border-yellow-500/20 mt-8">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <CreditCard className="h-5 w-5 text-yellow-600" />
+                支付测试专项方案
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">{paymentTesting.description}</p>
+            </CardHeader>
+          </Card>
+
+          {/* 支付渠道 */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Banknote className="h-4 w-4 text-primary" />
+                支付渠道覆盖
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+                {paymentTesting.paymentChannels.map((channel, idx) => (
+                  <div key={idx} className="p-3 rounded-lg bg-muted/30 border">
+                    <div className="font-medium text-sm mb-2">{channel.channel}</div>
+                    <div className="flex flex-wrap gap-1 mb-2">
+                      {channel.features.map((f, i) => (
+                        <Badge key={i} variant="outline" className="text-xs">{f}</Badge>
+                      ))}
+                    </div>
+                    <p className="text-xs text-muted-foreground">{channel.notes}</p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* 支付测试场景 */}
+          {paymentTesting.testScenarios.map((category) => (
+            <Card key={category.category}>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <category.icon className="h-4 w-4 text-primary" />
+                  {category.category}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ScrollArea className="w-full">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="p-2 text-left font-medium">ID</th>
+                        <th className="p-2 text-left font-medium">场景</th>
+                        <th className="p-2 text-left font-medium">测试步骤</th>
+                        <th className="p-2 text-left font-medium">预期结果</th>
+                        <th className="p-2 text-left font-medium">优先级</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {category.cases.map((testCase, idx) => (
+                        <tr key={idx} className="border-b last:border-0">
+                          <td className="p-2 font-mono text-xs">{testCase.id}</td>
+                          <td className="p-2 font-medium">{testCase.scenario}</td>
+                          <td className="p-2 text-muted-foreground">{testCase.steps}</td>
+                          <td className="p-2 text-muted-foreground">{testCase.expected}</td>
+                          <td className="p-2">
+                            <Badge variant={testCase.priority === "P0" ? "destructive" : testCase.priority === "P1" ? "default" : "secondary"}>
+                              {testCase.priority}
+                            </Badge>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </ScrollArea>
+              </CardContent>
+            </Card>
+          ))}
+
+          {/* 关键校验点 */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <ShieldCheck className="h-4 w-4 text-primary" />
+                支付关键校验点
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {paymentTesting.keyCheckpoints.map((cp, idx) => (
+                  <div key={idx} className="p-3 rounded-lg bg-muted/30 border">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-medium text-sm">{cp.checkpoint}</span>
+                      <Badge variant="destructive" className="text-xs">{cp.risk}</Badge>
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                      {cp.validations.map((v, i) => (
+                        <Badge key={i} variant="outline" className="text-xs">{v}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* 沙盒测试指南 */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Key className="h-4 w-4 text-primary" />
+                沙盒测试环境配置
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid md:grid-cols-2 gap-4">
+                {paymentTesting.sandboxTestGuide.map((guide, idx) => (
+                  <div key={idx} className="p-3 rounded-lg bg-muted/30 border">
+                    <div className="font-medium text-sm mb-2">{guide.platform}</div>
+                    <ol className="list-decimal list-inside text-xs text-muted-foreground space-y-1 mb-2">
+                      {guide.steps.map((step, i) => (
+                        <li key={i}>{step}</li>
+                      ))}
+                    </ol>
+                    <div className="text-xs text-yellow-600 flex items-start gap-1">
+                      <AlertTriangle className="h-3 w-3 mt-0.5 shrink-0" />
+                      {guide.notes}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* 风险提醒 */}
+          <Card className="bg-destructive/5 border-destructive/20">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2 text-destructive">
+                <ShieldAlert className="h-4 w-4" />
+                支付测试风险提醒
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid md:grid-cols-2 gap-2">
+                {paymentTesting.riskReminders.map((reminder, idx) => (
+                  <div key={idx} className="flex items-start gap-2 text-sm">
+                    <XCircle className="h-4 w-4 text-destructive mt-0.5 shrink-0" />
+                    <span className="text-muted-foreground">{reminder}</span>
+                  </div>
                 ))}
               </div>
             </CardContent>
