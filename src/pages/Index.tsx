@@ -13,23 +13,62 @@ import { useHistory } from "@/hooks/use-history";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  getLatestAnnouncement,
+  getLatestAnnouncementId,
+  announcementTypeConfig,
+  contactConfig,
+  type Announcement
+} from "@/data/announcements";
 
-// 公告版本号 - 每次有新公告时更新此值
-const ANNOUNCEMENT_VERSION = "2025-01-01-v1";
-
-const QQ_UIN = "349487325";
+// 从配置获取联系方式
+const QQ_UIN = contactConfig.qq;
 const QQ_SCHEME_DESKTOP = `tencent://message/?uin=${QQ_UIN}`;
 const QQ_SCHEME_MOBILE = `mqqwpa://im/chat?chat_type=wpa&uin=${QQ_UIN}&version=1&src_type=web&web_src=toolbox`;
 const QQ_WEB_FALLBACK = `https://wpa.qq.com/msgrd?v=3&uin=${QQ_UIN}&site=qq&menu=yes`;
 
+/** 格式化日期显示 */
+const formatDate = (dateStr: string): string => {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('zh-CN', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+};
+
+/** 公告内容组件 */
+const AnnouncementContent = ({ announcement }: { announcement: Announcement }) => (
+  <div className="rounded-lg border border-border/50 bg-muted/30 p-4 space-y-3">
+    {announcement.items.map((item, index) => {
+      const typeConfig = announcementTypeConfig[item.type];
+      return (
+        <div key={index} className="flex items-start gap-2">
+          <Badge variant={typeConfig.variant} className="mt-0.5 shrink-0">
+            {typeConfig.label}
+          </Badge>
+          <div>
+            <p className="font-medium text-foreground">{item.title}</p>
+            <p className="text-sm text-muted-foreground mt-1">{item.description}</p>
+          </div>
+        </div>
+      );
+    })}
+  </div>
+);
+
 const AnnouncementDialog = () => {
+  const latestAnnouncement = getLatestAnnouncement();
+  const latestId = getLatestAnnouncementId();
+
   const [isRead, setIsRead] = useState(() => {
-    return localStorage.getItem("announcement_read") === ANNOUNCEMENT_VERSION;
+    return localStorage.getItem("announcement_read") === latestId;
   });
 
   const handleOpen = (open: boolean) => {
-    if (open && !isRead) {
-      localStorage.setItem("announcement_read", ANNOUNCEMENT_VERSION);
+    if (open && !isRead && latestId) {
+      localStorage.setItem("announcement_read", latestId);
       setIsRead(true);
     }
   };
@@ -52,7 +91,6 @@ const AnnouncementDialog = () => {
     document.addEventListener("visibilitychange", onVisibilityChange);
     window.addEventListener("blur", markLeave, { once: true });
 
-    // 尝试拉起 QQ（浏览器对自定义协议支持不一致，这里做 best-effort）
     const iframe = document.createElement("iframe");
     iframe.style.display = "none";
     iframe.src = scheme;
@@ -62,7 +100,6 @@ const AnnouncementDialog = () => {
       if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
     }, 800);
 
-    // 若未成功拉起（页面未进入后台/未失焦），则跳转到 Web 兜底
     window.setTimeout(() => {
       document.removeEventListener("visibilitychange", onVisibilityChange);
       if (!didLeave) {
@@ -71,16 +108,15 @@ const AnnouncementDialog = () => {
     }, 1100);
   };
 
-  const currentDate = new Date().toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
+  // 如果没有公告，不显示公告按钮
+  if (!latestAnnouncement) {
+    return null;
+  }
 
   return (
     <Dialog onOpenChange={handleOpen}>
       <DialogTrigger asChild>
-        <button 
+        <button
           className="relative p-1 rounded-full bg-primary/10 hover:bg-primary/20 transition-colors ring-2 ring-primary/30 hover:ring-primary/50"
           title="系统公告"
           aria-label="系统公告"
@@ -91,76 +127,68 @@ const AnnouncementDialog = () => {
           )}
         </button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[85vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-lg">
             <Megaphone className="h-5 w-5 text-primary" />
             系统公告
           </DialogTitle>
         </DialogHeader>
-        
-        <div className="space-y-4">
-          {/* 公告元信息 */}
-          <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-            <div className="flex items-center gap-1.5">
-              <Calendar className="h-4 w-4" />
-              <span>{currentDate}</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <User className="h-4 w-4" />
-              <span>发布人：系统</span>
-            </div>
-          </div>
-          
-          <Separator />
-          
-          {/* 公告正文 */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <FileText className="h-4 w-4 text-primary" />
-              <h4 className="font-semibold text-foreground">更新内容</h4>
-            </div>
-            
-            <div className="rounded-lg border border-border/50 bg-muted/30 p-4 space-y-3">
-              <div className="flex items-start gap-2">
-                <Badge variant="default" className="mt-0.5 shrink-0">新增</Badge>
-                <div>
-                  <p className="font-medium text-foreground">文档参考 - 安全测试参考</p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    新增安全测试参考文档，包含 OWASP Top 10 详细攻击示例、漏洞代码与安全代码对比、测试 Payload、安全响应头配置、安全工具集合及检查清单等内容。
-                  </p>
-                </div>
+
+        <ScrollArea className="flex-1 pr-4">
+          <div className="space-y-4">
+            {/* 公告元信息 */}
+            <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+              <div className="flex items-center gap-1.5">
+                <Calendar className="h-4 w-4" />
+                <span>{formatDate(latestAnnouncement.date)}</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <User className="h-4 w-4" />
+                <span>发布人：{latestAnnouncement.author}</span>
               </div>
             </div>
+
+            <Separator />
+
+            {/* 公告正文 */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <FileText className="h-4 w-4 text-primary" />
+                <h4 className="font-semibold text-foreground">更新内容</h4>
+              </div>
+
+              <AnnouncementContent announcement={latestAnnouncement} />
+            </div>
+
+            <Separator />
+
+            {/* 联系方式 */}
+            <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
+              <a
+                href={QQ_SCHEME_DESKTOP}
+                onClick={handleQQClick}
+                aria-label="联系QQ"
+                className="flex items-center gap-1.5 text-muted-foreground hover:text-primary transition-colors"
+              >
+                <MessageCircle className="h-4 w-4" />
+                <span>QQ</span>
+              </a>
+              <a
+                href={`mailto:${contactConfig.email}`}
+                className="flex items-center gap-1.5 text-muted-foreground hover:text-primary transition-colors"
+              >
+                <Mail className="h-4 w-4" />
+                <span>邮箱</span>
+              </a>
+            </div>
+
+            {/* 底部提示 */}
+            <p className="text-xs text-muted-foreground text-center">
+              感谢使用万能工具箱，如有问题或建议请反馈
+            </p>
           </div>
-          
-          <Separator />
-          
-          {/* 联系方式 */}
-          <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
-            <a 
-              href={QQ_SCHEME_DESKTOP}
-              onClick={handleQQClick}
-              aria-label="联系QQ"
-              className="flex items-center gap-1.5 text-muted-foreground hover:text-primary transition-colors"
-            >
-              <MessageCircle className="h-4 w-4" />
-              <span>QQ</span>
-            </a>
-            <a 
-              href="mailto:admin@996fb.cn"
-              className="flex items-center gap-1.5 text-muted-foreground hover:text-primary transition-colors"
-            >
-              <Mail className="h-4 w-4" />
-              <span>邮箱</span>
-            </a>
-          </div>
-          
-          {/* 底部提示 */}
-          <p className="text-xs text-muted-foreground text-center">
-            感谢使用万能工具箱，如有问题或建议请反馈
-          </p>
-        </div>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );
@@ -186,7 +214,7 @@ const Index = () => {
   // Filter tools based on search query
   const filteredTools = useMemo(() => {
     if (!searchQuery.trim()) return null;
-    
+
     const query = searchQuery.toLowerCase();
     return allTools.filter(
       (tool) =>
@@ -229,10 +257,10 @@ const Index = () => {
 
             {/* Search Box */}
             <div className="mb-4 max-w-lg mx-auto">
-              <SearchBox 
-                value={searchQuery} 
-                onChange={setSearchQuery} 
-                placeholder="搜索工具名称或描述..." 
+              <SearchBox
+                value={searchQuery}
+                onChange={setSearchQuery}
+                placeholder="搜索工具名称或描述..."
               />
             </div>
 
@@ -293,7 +321,7 @@ const Index = () => {
           ) : (
             <>
               {/* History Section */}
-              <HistorySection 
+              <HistorySection
                 history={history}
                 onClearHistory={clearHistory}
                 isFavorite={isFavorite}
@@ -301,12 +329,12 @@ const Index = () => {
               />
 
               {/* Favorites Section */}
-              <FavoritesSection 
+              <FavoritesSection
                 favorites={favorites}
                 onToggleFavorite={toggleFavorite}
                 isFavorite={isFavorite}
               />
-              
+
               {/* All Categories */}
               {categoriesWithTools.map((category) => (
                 <CategorySection
