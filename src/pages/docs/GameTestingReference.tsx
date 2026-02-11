@@ -28,7 +28,6 @@ import {
   Box,
   Clock,
   DollarSign,
-  Heart,
   Swords,
   Package,
   Coins,

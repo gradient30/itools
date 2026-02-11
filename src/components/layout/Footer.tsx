@@ -1,4 +1,4 @@
-import { Layers, Heart } from "lucide-react";
+import { Layers } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export function Footer() {
@@ -25,10 +25,8 @@ export function Footer() {
           </div>
 
           {/* Copyright */}
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <span>Made with</span>
-            <Heart className="h-3 w-3 text-destructive fill-destructive" />
-            <span>© {new Date().getFullYear()} 万能工具箱</span>
+          <div className="text-xs text-muted-foreground">
+            © {new Date().getFullYear()} 万能工具箱
           </div>
         </div>
       </div>
