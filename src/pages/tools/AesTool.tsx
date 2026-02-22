@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Shield, Copy, RefreshCw, Lock, Unlock, Lightbulb } from "lucide-react";
+import { Shield, Copy, RefreshCw, Lock, Unlock, Lightbulb, Info } from "lucide-react";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
 import {
   bufferToBase64,
@@ -298,7 +299,17 @@ export default function AesTool() {
         {/* Configuration */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="space-y-2">
-            <Label>加密模式</Label>
+            <div className="flex items-center gap-1.5">
+              <Label>加密模式</Label>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p>决定 AES 块加密如何连续工作。GCM 包含数据完整性验证，是最安全的选择。CBC 需要补码，CTR 不需要。</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <Select
               value={mode}
               onValueChange={(v) => setMode(v as AesMode)}
@@ -314,7 +325,17 @@ export default function AesTool() {
             </Select>
           </div>
           <div className="space-y-2">
-            <Label>密钥长度</Label>
+            <div className="flex items-center gap-1.5">
+              <Label>密钥长度</Label>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p>决定 AES 算法强度的核心参数。256位（32字节）提供目前最高的安全级别。</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <Select
               value={keySize.toString()}
               onValueChange={(v) => setKeySize(parseInt(v) as KeySize)}
@@ -379,7 +400,17 @@ export default function AesTool() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label>IV (十六进制)</Label>
+              <div className="flex items-center gap-1.5">
+                <Label>IV (十六进制)</Label>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-[200px]">
+                    <p>初始化向量(Initialization Vector)。GCM模式为12字节，其他多为16字节。每次加密都应该使用不同的随机IV以确保安全。</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
               <div className="flex gap-2">
                 <Input
                   value={rawIv}

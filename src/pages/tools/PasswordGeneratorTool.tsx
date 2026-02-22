@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { useLocalStorage } from "@/hooks/use-local-storage";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -10,12 +11,12 @@ import { KeyRound, Copy, RefreshCw, Check, X } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 const PasswordGeneratorTool = () => {
-  const [length, setLength] = useState(16);
-  const [uppercase, setUppercase] = useState(true);
-  const [lowercase, setLowercase] = useState(true);
-  const [numbers, setNumbers] = useState(true);
-  const [symbols, setSymbols] = useState(true);
-  const [excludeAmbiguous, setExcludeAmbiguous] = useState(false);
+  const [length, setLength] = useLocalStorage("pwd-length", 16);
+  const [uppercase, setUppercase] = useLocalStorage("pwd-upper", true);
+  const [lowercase, setLowercase] = useLocalStorage("pwd-lower", true);
+  const [numbers, setNumbers] = useLocalStorage("pwd-numbers", true);
+  const [symbols, setSymbols] = useLocalStorage("pwd-symbols", true);
+  const [excludeAmbiguous, setExcludeAmbiguous] = useLocalStorage("pwd-exclude-ambiguous", false);
   const [password, setPassword] = useState("");
 
   const generatePassword = useCallback(() => {

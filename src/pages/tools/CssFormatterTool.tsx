@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { ToolLayout } from "@/components/ToolLayout";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Paintbrush, Copy, Wand2, Minimize2 } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
+import { LineNumberEditor } from "@/components/LineNumberEditor";
+import { Paintbrush, Copy, Wand2, Minimize2, Upload, X } from "lucide-react";
+import { useFileUpload } from "@/hooks/use-file-upload";
+import { toast } from "sonner";
 
-const CssFormatterTool = () => {
+export default function CssFormatterTool() {
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
+  const uploader = useFileUpload({ multiple: false });
 
   const formatCSS = (css: string, minify: boolean = false): string => {
     if (minify) {
@@ -94,99 +96,137 @@ const CssFormatterTool = () => {
 
   const handleFormat = () => {
     if (!input.trim()) {
-      toast({
-        title: "错误",
-        description: "请输入CSS代码",
-        variant: "destructive",
-      });
+      toast.error("请输入要格式化的CSS代码");
       return;
     }
 
     try {
       const formatted = formatCSS(input);
       setOutput(formatted);
-      toast({ title: "格式化成功" });
+      toast.success("CSS格式化成功");
     } catch {
-      toast({
-        title: "格式化失败",
-        description: "CSS代码格式可能有误",
-        variant: "destructive",
-      });
+      toast.error("CSS格式化失败");
     }
   };
 
   const handleMinify = () => {
     if (!input.trim()) {
-      toast({
-        title: "错误",
-        description: "请输入CSS代码",
-        variant: "destructive",
-      });
+      toast.error("请输入要压缩的CSS代码");
       return;
     }
 
-    const minified = formatCSS(input, true);
-    setOutput(minified);
-    toast({ title: "压缩成功" });
+    try {
+      const minified = formatCSS(input, true);
+      setOutput(minified);
+      toast.success("CSS压缩成功");
+    } catch {
+      toast.error("CSS压缩失败");
+    }
   };
 
-  const handleCopy = async () => {
-    if (!output) return;
-    await navigator.clipboard.writeText(output);
-    toast({ title: "已复制到剪贴板" });
+  const handleCopy = () => {
+    if (!output) {
+      toast.error("没有内容可复制");
+      return;
+    }
+    navigator.clipboard.writeText(output);
+    toast.success("处理结果已复制到剪贴板");
   };
+
+  const clear = () => {
+    setInput("");
+    setOutput("");
+  };
+
+  const exampleCSS = `.container{display:flex;justify-content:center;align-items:center;}.button{background-color:#007bff;color:white;padding:10px 20px;border:none;border-radius:4px;}`;
 
   return (
     <ToolLayout
       title="CSS格式化"
-      description="CSS代码格式化与压缩"
+      description="CSS代码格式化、美化与压缩，支持左右对比和直接拖拽文件"
       icon={Paintbrush}
     >
-      <div className="space-y-6">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">输入CSS</CardTitle>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 h-auto min-h-[600px]">
+        {/* Left Input Section */}
+        <Card
+          {...uploader.createDropHandler((files) => setInput(files[0].content))}
+          className="border-2 border-dashed border-transparent hover:border-primary/50 transition-colors flex flex-col"
+        >
+          <CardHeader className="pb-3 shrink-0">
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base font-semibold flex items-center gap-2">
+                  输入源CSS
+                </CardTitle>
+                <div className="flex items-center gap-1">
+                  <input
+                    type="file"
+                    accept=".css,.txt"
+                    ref={uploader.fileInputRef}
+                    className="hidden"
+                    onChange={uploader.createChangeHandler((files) => setInput(files[0].content))}
+                  />
+                  <Button variant="ghost" size="sm" onClick={uploader.triggerDialog} className="h-6 px-2 text-xs">
+                    <Upload className="h-3 w-3 mr-1" />上传
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => setInput(exampleCSS)} className="h-6 px-2 text-xs text-muted-foreground">
+                    示例CSS
+                  </Button>
+                  {input && (
+                    <Button variant="ghost" size="sm" onClick={clear} className="h-6 px-2 text-xs text-muted-foreground">
+                      <X className="h-3 w-3 mr-1" />清空
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
           </CardHeader>
-          <CardContent>
-            <Textarea
-              placeholder={`.container{display:flex;justify-content:center;align-items:center;}.button{background-color:#007bff;color:white;padding:10px 20px;border:none;border-radius:4px;}`}
+          <CardContent className="flex flex-col flex-1 p-0 px-6 pb-6">
+            <LineNumberEditor
               value={input}
-              onChange={(e) => setInput(e.target.value)}
-              className="min-h-[200px] font-mono text-sm"
+              onChange={setInput}
+              placeholder='将未格式化的CSS代码粘贴或拖拽文件到这里...'
+              status="default"
+              minHeight={400}
             />
           </CardContent>
         </Card>
 
-        <div className="flex flex-wrap gap-3 justify-center">
-          <Button onClick={handleFormat}>
-            <Wand2 className="mr-2 h-4 w-4" />
-            格式化
-          </Button>
-          <Button onClick={handleMinify} variant="secondary">
-            <Minimize2 className="mr-2 h-4 w-4" />
-            压缩
-          </Button>
-        </div>
+        {/* Right Output Section */}
+        <Card className="flex flex-col">
+          <CardHeader className="pb-3 shrink-0">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <CardTitle className="text-base font-semibold">处理结果</CardTitle>
+              </div>
 
-        <Card>
-          <CardHeader className="pb-3 flex flex-row items-center justify-between">
-            <CardTitle className="text-base">输出结果</CardTitle>
-            <Button variant="ghost" size="sm" onClick={handleCopy} disabled={!output}>
-              <Copy className="h-4 w-4" />
-            </Button>
+              <div className="flex flex-wrap items-center gap-2 justify-end">
+                <Button onClick={handleFormat} disabled={!input.trim()} className="h-7 px-3 text-xs gap-1.5" size="sm">
+                  <Wand2 className="h-3 w-3" />格式化
+                </Button>
+                <Button onClick={handleMinify} disabled={!input.trim()} variant="outline" className="h-7 px-3 text-xs gap-1.5 bg-background shadow-xs hover:bg-accent hover:text-accent-foreground" size="sm">
+                  <Minimize2 className="h-3 w-3" />压缩
+                </Button>
+              </div>
+            </div>
+            <div className="flex justify-end mt-2 pt-2 border-t">
+              <Button variant="ghost" size="sm" onClick={handleCopy} disabled={!output} className="h-8 px-3 text-xs">
+                <Copy className="h-3 w-3 mr-1" />复制结果
+              </Button>
+            </div>
           </CardHeader>
-          <CardContent>
-            <Textarea
+          <CardContent className="flex flex-col flex-1 p-0 px-6 pb-6">
+            <LineNumberEditor
               value={output}
+              onChange={() => { }}
+              placeholder="结果将显示在这里..."
               readOnly
-              placeholder="处理结果将显示在这里..."
-              className="min-h-[200px] font-mono text-sm"
+              status="default"
+              minHeight={400}
             />
           </CardContent>
         </Card>
       </div>
     </ToolLayout>
   );
-};
-
-export default CssFormatterTool;
+}
