@@ -18,7 +18,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Download, FileSpreadsheet, FileText, Eye, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
-import * as XLSX from "xlsx";
 
 // 专业测试用例模板数据 - 更详细的行业标准模板
 export const testCaseTemplates = {
@@ -206,32 +205,89 @@ export function TestCaseExporter({ showPreview = true }: TestCaseExporterProps) 
   const exportToExcel = (templateKey: TemplateKey | "all") => {
     setExporting(true);
     try {
-      const workbook = XLSX.utils.book_new();
+      const usedSheetNames = new Set<string>();
 
-      if (templateKey === "all") {
-        Object.entries(testCaseTemplates).forEach(([key, template]) => {
-          const wsData = [template.columns, ...template.rows];
-          const worksheet = XLSX.utils.aoa_to_sheet(wsData);
-          worksheet["!cols"] = template.columns.map((col) => ({
-            wch: Math.max(col.length * 2, 12)
-          }));
-          XLSX.utils.book_append_sheet(workbook, worksheet, template.name.slice(0, 31));
-        });
-      } else {
-        const template = testCaseTemplates[templateKey];
-        const wsData = [template.columns, ...template.rows];
-        const worksheet = XLSX.utils.aoa_to_sheet(wsData);
-        worksheet["!cols"] = template.columns.map((col) => ({
-          wch: Math.max(col.length * 2, 12)
-        }));
-        XLSX.utils.book_append_sheet(workbook, worksheet, template.name.slice(0, 31));
-      }
+      const normalizeSheetName = (name: string) => {
+        const cleaned = name.replace(/[\\/*?:[\]]/g, "_").trim();
+        return (cleaned || "Sheet").slice(0, 31);
+      };
+
+      const getUniqueSheetName = (name: string) => {
+        const base = normalizeSheetName(name);
+        let candidate = base;
+        let index = 1;
+        while (usedSheetNames.has(candidate)) {
+          const suffix = `_${index}`;
+          candidate = `${base.slice(0, Math.max(0, 31 - suffix.length))}${suffix}`;
+          index += 1;
+        }
+        usedSheetNames.add(candidate);
+        return candidate;
+      };
+
+      const escapeXml = (value: string) =>
+        value
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/\"/g, "&quot;")
+          .replace(/'/g, "&apos;")
+          .replace(/\r\n/g, "\n")
+          .replace(/\r/g, "\n");
+
+      const toCell = (value: string, isHeader = false) => {
+        const style = isHeader ? ' ss:StyleID="Header"' : "";
+        return `<Cell${style}><Data ss:Type="String">${escapeXml(value)}</Data></Cell>`;
+      };
+
+      const templateEntries =
+        templateKey === "all"
+          ? Object.values(testCaseTemplates)
+          : [testCaseTemplates[templateKey]];
+
+      const worksheetXml = templateEntries
+        .map((template) => {
+          const sheetName = getUniqueSheetName(template.name);
+          const headerRow = `<Row>${template.columns.map((col) => toCell(col, true)).join("")}</Row>`;
+          const dataRows = template.rows
+            .map((row) => `<Row>${row.map((cell) => toCell(String(cell ?? ""))).join("")}</Row>`)
+            .join("");
+          return `<Worksheet ss:Name="${escapeXml(sheetName)}"><Table>${headerRow}${dataRows}</Table></Worksheet>`;
+        })
+        .join("");
 
       const fileName = templateKey === "all" 
-        ? `游戏测试用例模板_全部_${new Date().toISOString().split('T')[0]}.xlsx`
-        : `游戏测试用例_${testCaseTemplates[templateKey].name}_${new Date().toISOString().split('T')[0]}.xlsx`;
-      
-      XLSX.writeFile(workbook, fileName);
+        ? `游戏测试用例模板_全部_${new Date().toISOString().split('T')[0]}.xls`
+        : `游戏测试用例_${testCaseTemplates[templateKey].name}_${new Date().toISOString().split('T')[0]}.xls`;
+
+      const workbookXml = `<?xml version="1.0" encoding="UTF-8"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+  <Styles>
+    <Style ss:ID="Header">
+      <Font ss:Bold="1"/>
+      <Alignment ss:Vertical="Center" ss:WrapText="1"/>
+      <Interior ss:Color="#F3F4F6" ss:Pattern="Solid"/>
+    </Style>
+  </Styles>
+  ${worksheetXml}
+</Workbook>`;
+
+      const blob = new Blob([workbookXml], {
+        type: "application/vnd.ms-excel;charset=utf-8",
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
       toast.success("Excel导出成功");
     } catch (error) {
       console.error("Export error:", error);
@@ -371,7 +427,7 @@ export function TestCaseExporter({ showPreview = true }: TestCaseExporterProps) 
                     </div>
                   </ScrollArea>
                   <div className="flex gap-2 mt-4 justify-end">
-                    <Button size="sm" variant="outline" onClick={() => exportToExcel(key)}>
+                    <Button size="sm" variant="outline" onClick={() => void exportToExcel(key)}>
                       <FileSpreadsheet className="h-4 w-4 mr-1" />
                       导出Excel
                     </Button>
@@ -397,12 +453,12 @@ export function TestCaseExporter({ showPreview = true }: TestCaseExporterProps) 
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
-          <DropdownMenuItem onClick={() => exportToExcel("all")}>
+          <DropdownMenuItem onClick={() => void exportToExcel("all")}>
             <Download className="h-4 w-4 mr-2" />
             全部模板
           </DropdownMenuItem>
           {templateList.map(([key, template]) => (
-            <DropdownMenuItem key={key} onClick={() => exportToExcel(key)}>
+            <DropdownMenuItem key={key} onClick={() => void exportToExcel(key)}>
               {template.name}
             </DropdownMenuItem>
           ))}

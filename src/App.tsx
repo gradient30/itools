@@ -64,6 +64,7 @@ const PortsReference = lazy(() => import("./pages/docs/PortsReference"));
 const SecurityTestingReference = lazy(() => import("./pages/docs/SecurityTestingReference"));
 const GameTestingReference = lazy(() => import("./pages/docs/GameTestingReference"));
 const SoftwareTestingReference = lazy(() => import("./pages/docs/SoftwareTestingReference"));
+const GameRnDLifecycleReference = lazy(() => import("./pages/docs/GameRnDLifecycleReference"));
 
 const queryClient = new QueryClient();
 
@@ -135,6 +136,7 @@ const App = () => (
               <Route path="/docs/security-testing" element={<SecurityTestingReference />} />
               <Route path="/docs/game-testing" element={<GameTestingReference />} />
               <Route path="/docs/software-testing" element={<SoftwareTestingReference />} />
+              <Route path="/docs/game-rnd-lifecycle" element={<GameRnDLifecycleReference />} />
 
               <Route path="*" element={<NotFound />} />
             </Routes>

@@ -67,10 +67,11 @@ const GradientTool = () => {
   };
 
   const copyTailwind = () => {
-    // Generate Tailwind-compatible gradient class suggestion
-    const tailwind = `bg-gradient-to-r from-[${colorStops[0].color}] to-[${colorStops[colorStops.length - 1].color}]`;
-    navigator.clipboard.writeText(tailwind);
-    toast.success("Tailwind类已复制到剪贴板");
+    // Avoid dynamic arbitrary-value utility strings that confuse static class extraction.
+    const gradient = generateGradientCSS();
+    const snippet = `className=\"bg-gradient-to-r\"\nstyle={{ background: \"${gradient}\" }}`;
+    navigator.clipboard.writeText(snippet);
+    toast.success("Tailwind片段已复制到剪贴板");
   };
 
   const resetToDefault = () => {
@@ -239,7 +240,7 @@ const GradientTool = () => {
                 </Button>
                 <Button onClick={copyTailwind} variant="outline" className="flex-1">
                   <Copy className="h-4 w-4 mr-2" />
-                  复制Tailwind
+                  复制Tailwind片段
                 </Button>
                 <Button onClick={resetToDefault} variant="outline">
                   <RotateCcw className="h-4 w-4" />

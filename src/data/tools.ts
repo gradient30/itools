@@ -335,6 +335,12 @@ export const toolCategories: ToolCategory[] = [
         path: "/docs/security-testing",
       },
       {
+        name: "游戏研发全生命周期",
+        description: "从需求分析到上线复盘的分层教学与企业落地方案",
+        icon: Gamepad2,
+        path: "/docs/game-rnd-lifecycle",
+      },
+      {
         name: "游戏测试技术",
         description: "游戏行业黑盒测试与质量验收指南",
         icon: Gamepad2,

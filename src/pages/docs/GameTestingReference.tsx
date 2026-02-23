@@ -1,10 +1,12 @@
 import { ToolLayout } from "@/components/ToolLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { TestCaseExporter } from "@/components/TestCaseExporter";
+import { Link } from "react-router-dom";
 import { 
   Gamepad2, 
   Target, 
@@ -1331,6 +1333,22 @@ const GameTestingReference = () => {
               </p>
             </div>
             <TestCaseExporter />
+          </div>
+        </CardHeader>
+      </Card>
+
+      <Card className="mb-6 border-primary/20 bg-primary/5">
+        <CardHeader className="pb-3">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div>
+              <CardTitle className="text-base">想看从需求到上线的完整流程？</CardTitle>
+              <p className="mt-1 text-sm text-muted-foreground">
+                该页面聚焦测试方法；全生命周期教学、12周训练营与企业落地手册已迁移到新页面。
+              </p>
+            </div>
+            <Button asChild size="sm">
+              <Link to="/docs/game-rnd-lifecycle">前往全生命周期页面</Link>
+            </Button>
           </div>
         </CardHeader>
       </Card>
