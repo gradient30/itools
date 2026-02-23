@@ -1,7 +1,9 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { ToolLayout } from "@/components/ToolLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -189,10 +191,12 @@ const qaStrategies = [
     }
 ];
 
-function LayoutDashboardIcon(props: any) {
+type LayerIconProps = React.ComponentProps<typeof Layers>;
+
+function LayoutDashboardIcon(props: LayerIconProps) {
     return <Layers {...props} />;
 }
-function Smartphone(props: any) {
+function Smartphone(props: LayerIconProps) {
     return <Terminal {...props} />;
 }
 
@@ -214,6 +218,27 @@ export default function SoftwareTestingReference() {
             description="2024-2026 前沿 DevOps 时代的质量保障全景指南与高效率工具汇编"
             icon={Bug}
         >
+            <Card className="mb-6 border-primary/20">
+                <CardHeader className="pb-3">
+                    <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                        <div className="space-y-1">
+                            <CardTitle className="text-base">关联实战文档</CardTitle>
+                            <p className="text-sm text-muted-foreground">
+                                需要版本级执行方案时，可直接使用“版本测试与管理方案”进行日常计划、门禁与复盘落地。
+                            </p>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                            <Button asChild size="sm">
+                                <Link to="/docs/version-testing-management">查看版本测试与管理方案</Link>
+                            </Button>
+                            <Button asChild size="sm" variant="outline">
+                                <Link to="/docs/game-rnd-lifecycle">查看游戏研发全生命周期</Link>
+                            </Button>
+                        </div>
+                    </div>
+                </CardHeader>
+            </Card>
+
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                 {/* 主要内容区 */}
                 <div className="lg:col-span-3 space-y-6">

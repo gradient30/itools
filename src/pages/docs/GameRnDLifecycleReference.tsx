@@ -578,6 +578,9 @@ export default function GameRnDLifecycleReference() {
                 <Link to="/docs/game-testing">查看游戏测试技术库</Link>
               </Button>
               <Button asChild size="sm" variant="outline">
+                <Link to="/docs/version-testing-management">查看版本测试管理方案</Link>
+              </Button>
+              <Button asChild size="sm" variant="outline">
                 <Link to="/docs/software-testing">查看现代测试工具体系</Link>
               </Button>
             </div>

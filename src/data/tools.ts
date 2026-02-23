@@ -352,6 +352,12 @@ export const toolCategories: ToolCategory[] = [
         icon: ShieldAlert,
         path: "/docs/software-testing",
       },
+      {
+        name: "版本测试与管理方案",
+        description: "游戏与App版本测试闭环、门禁、工具矩阵与上手手册",
+        icon: ShieldAlert,
+        path: "/docs/version-testing-management",
+      },
     ],
   },
 ];
